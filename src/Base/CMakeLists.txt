@@ -8,4 +8,4 @@ set(
         Log.h
 )
 
-add_library(Base ${BASE_SOURCE} ${BASE_HEADER})
+add_library(Base STATIC ${BASE_SOURCE} ${BASE_HEADER})

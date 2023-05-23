@@ -11,5 +11,5 @@ set(
         Utils.h
 )
 
-add_library(Loader ${LOAD_HEADER} ${LOAD_SOURCE})
+add_library(Loader SHARED ${LOAD_HEADER} ${LOAD_SOURCE})
 target_link_libraries(Loader PUBLIC Base)

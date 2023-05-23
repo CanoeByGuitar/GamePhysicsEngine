@@ -10,4 +10,4 @@ set(
         GC.h
 )
 
-add_library(Math ${MATH_SOURCE} ${MATH_HEADER})
+add_library(Math SHARED ${MATH_SOURCE} ${MATH_HEADER})

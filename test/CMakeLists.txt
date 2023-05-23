@@ -1,4 +1,3 @@
-
 add_executable(LogTest LogTest.cpp)
 target_link_libraries(LogTest Base)
 
@@ -14,3 +13,6 @@ target_link_libraries(EncodingTest Loader)
 
 add_executable(ReadHeaderTest ReadHeaderTest.cpp)
 target_link_libraries(ReadHeaderTest Loader)
+
+add_executable(Geo2DTest GeoTest.cpp)
+target_link_libraries(Geo2DTest Engine)
