@@ -1,11 +1,11 @@
-set(
+file(GLOB
         BASE_SOURCE
-        Log.cpp
+        *.cpp
 )
 
-set(
+file(GLOB
         BASE_HEADER
-        Log.h
+        *.h
 )
 
 add_library(Base STATIC ${BASE_SOURCE} ${BASE_HEADER})

@@ -1,8 +1,8 @@
-set(ENGINE_HEADER
-        Geometry.h)
+File(GLOB ENGINE_SOURCE
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-set(ENGINE_SOURCE
-        Geometry.cpp)
+FILE(GLOB ENGINE_HEAD
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
-add_library(Engine SHARED ENGINE_HEADER ENGINE_SOURCE)
-target_link_libraries(Engine PUBLIC Base)
+add_library(Engine SHARED ${ENGINE_HEAD} ${ENGINE_SOURCE})
+target_link_libraries(Engine PUBLIC Renderer Base Geometry Loader Window)

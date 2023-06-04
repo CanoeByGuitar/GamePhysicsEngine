@@ -14,5 +14,14 @@ target_link_libraries(EncodingTest Loader)
 add_executable(ReadHeaderTest ReadHeaderTest.cpp)
 target_link_libraries(ReadHeaderTest Loader)
 
-add_executable(Geo2DTest GeoTest.cpp)
-target_link_libraries(Geo2DTest Engine)
+add_executable(GeoTest GeoTest.cpp)
+target_link_libraries(GeoTest Engine)
+
+add_executable(GLFWTest GLFWTest.cpp)
+target_link_libraries(GLFWTest Renderer)
+
+add_executable(BaseUtilTest BaseUtilTest.cpp)
+target_link_libraries(BaseUtilTest Base)
+
+add_executable(RendererTest RendererTest.cpp)
+target_link_libraries(RendererTest Engine)

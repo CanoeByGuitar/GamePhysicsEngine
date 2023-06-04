@@ -1,14 +1,9 @@
-set(
-        LOAD_SOURCE
-        UnifiedModel.cpp
+file(GLOB LOAD_SOURCE
+        *.cpp
 )
 
-set(
-        LOAD_HEADER
-        BinReader.h
-        UnifiedModel.h
-        PmxReader.h
-        Utils.h
+file(GLOB LOAD_HEADER
+        *.h
 )
 
 add_library(Loader SHARED ${LOAD_HEADER} ${LOAD_SOURCE})
