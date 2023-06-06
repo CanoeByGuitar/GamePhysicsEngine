@@ -26,7 +26,7 @@ namespace renderer{
         glEnableVertexAttribArray(index);
     }
 
-    void GLVertexArray::Unbind() {
+    void GLVertexArray::UnBind() {
         glBindVertexArray(0);
     }
 

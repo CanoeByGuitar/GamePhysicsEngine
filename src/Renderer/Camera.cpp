@@ -9,12 +9,13 @@ Camera::Camera() {
 }
 
 void Camera::Update(const double deltaTime) {
-    if (Input::GetInstance().IsKeyPressed(GLFW_KEY_TAB)) {
-        m_dirty = !m_dirty;
-    }
+//    if (Input::GetInstance().IsKeyPressed(GLFW_KEY_TAB)) {
+//        m_dirty = !m_dirty;
+//        PHY_INFO("Click on TAB, m_dirty = {}", m_dirty);
+//    }
 
     if (m_dirty) {
-        // Update view from mouse movementg
+        // Update view from mouse movement
         updateView();
 
         // Update Keyboard
@@ -56,15 +57,19 @@ void Camera::updateView(const bool constrainPitch) {
         m_prevX = xPos;
         m_prevY = yPos;
 
-        m_yaw += xOffset;
-        m_pitch += yOffset;
 
-        if(constrainPitch){
-            if(m_pitch > 89.0) m_pitch = 89.0;
-            if(m_pitch < -89.0) m_pitch = -89.0;
+        if(Input::GetInstance().IsMouseClicked(GLFW_MOUSE_BUTTON_1)){
+            // only update camera info when mouse button 1 clicked
+            m_yaw += xOffset;
+            m_pitch -= yOffset;
+
+            if(constrainPitch){
+                if(m_pitch > 89.0) m_pitch = 89.0;
+                if(m_pitch < -89.0) m_pitch = -89.0;
+            }
+            updateVectors();
         }
 
-        updateVectors();
     }
 }
 

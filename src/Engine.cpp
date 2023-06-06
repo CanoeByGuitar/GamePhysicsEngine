@@ -3,6 +3,7 @@
 //
 
 #include "Engine.h"
+#include "timer.h"
 
 void Engine::connectWindowInstanceToInput(GLFWwindow *window) {
     const auto resizeCallback = [](GLFWwindow* w, auto width, auto height) {
@@ -19,6 +20,11 @@ void Engine::connectWindowInstanceToInput(GLFWwindow *window) {
         Input::GetInstance().mouseMoved(xPos, yPos);
     };
     glfwSetCursorPosCallback(window, cursorPosCallback);
+
+    const auto mouseClickCallback = [](GLFWwindow* w, auto button, auto action, auto mode){
+        Input::GetInstance().mouseClicked(button, action, mode);
+    };
+    glfwSetMouseButtonCallback(window, mouseClickCallback);
 }
 
 float framesPerSecond(const float frameTimeMs){
@@ -35,18 +41,33 @@ Engine::Engine(const std::shared_ptr<Scene> &scene) {
     connectWindowInstanceToInput(window);
 
     PHY_INFO("Initializing renderer...");
+    m_scene = scene;
     m_renderer.Init();
+
+    auto renderList = m_scene->GetObjects();
+    RenderSystem::LoadStaticObjects(renderList.cbegin(), renderList.cend());
+
     m_renderer.SetProjectionMatrix(m_camera);
 
-    m_scene = scene;
 }
 
 void Engine::Execute() {
+    bool hasOneSecondPassed = false;
+    Timer timer(1.0f, [&](){
+        hasOneSecondPassed = true;
+    });
+
     while (!m_window.ShouldClose()){
+        timer.Update((float)glfwGetTime());
+        if(hasOneSecondPassed){
+            // TODO: print some info every one second including FPS
+            hasOneSecondPassed = false;
+        }
+        auto dt = timer.GetDelta();
+
         m_window.Update();
         const auto& [width, height] = m_window.GetFramebufferDims();
 
-        auto dt = 0.016;
         m_camera.Update(dt);
         m_renderer.Update(m_camera);
 

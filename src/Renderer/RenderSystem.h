@@ -10,6 +10,9 @@
 #include "GLShaderProgramFactory.h"
 #include "Camera.h"
 
+
+
+
 namespace renderer{
     class Scene;
 //    class GLShaderProgram;
@@ -20,6 +23,10 @@ namespace renderer{
 
     public:
         void Init();
+
+        static void LoadStaticObjects(RenderListIterator renderListBegin,
+                               RenderListIterator renderListEnd);
+
         void Update(const Camera& camera);
 
         //Release OpenGl resources
@@ -34,14 +41,17 @@ namespace renderer{
                     RenderListIterator renderListBegin,
                     RenderListIterator renderListEnd);
 
+
     private:
         void compileShaders();
         void setDefaultState();
         void renderObjectsWithTextures(GLShaderProgram& shader,
                                        RenderListIterator renderListBegin,
                                        RenderListIterator renderListEnd) const;
-        void renderObjectsWithoutTextures(RenderListIterator renderListBegin,
-                                       RenderListIterator renderListEnd) const;
+        void renderObjectsNoTextures(RenderListIterator renderListBegin,
+                                     RenderListIterator renderListEnd) const;
+
+
         void setupTextureSamplers();
 
 

@@ -19,6 +19,11 @@ namespace renderer{
         STREAM = GL_STREAM_DRAW
     };
 
+    enum PrimitiveType : int {
+        LINE = GL_LINES,
+        TRIANGLE = GL_TRIANGLES
+    };
+
 class GLVertexArray{
 public:
     GLVertexArray() = default;
@@ -26,7 +31,7 @@ public:
     void AttachBuffer(BufferType type, size_t size, const void* data, DrawMode mode);
     void Bind() const;
     void EnableAttribute(GLuint index, int size, GLuint stride, const void* offset);
-    void Unbind() ;
+    void UnBind() ;
     void Delete();
 
 private:

@@ -13,19 +13,40 @@
 namespace renderer {
     class Object{
     public:
-        explicit Object(const std::string& name):m_name(name){}
+        explicit Object(const std::string& name,
+                        DrawMode mode = DrawMode::DYNAMIC,
+                        PrimitiveType type = PrimitiveType::TRIANGLE,
+                        vec3 color = vec3(-1))
+                        :m_name(name),  m_drawMode(mode), m_primitiveType(type),m_color(color){}
         virtual ~Object() = default;
         virtual void SetPipelineData() = 0;
         virtual void SetupVerticesBuffer() = 0;
         virtual void SetMaterial() = 0;
         virtual void BindVAO() = 0;
+        virtual void UnBindVAO() = 0;
         virtual void Draw() = 0;
 
-        std::string GetObjName(){
+        std::string GetObjName() const{
             return m_name;
         }
-    private:
+
+        DrawMode GetDrawMode() const {
+            return m_drawMode;
+        }
+
+        PrimitiveType GetPrimitiveType() const {
+            return m_primitiveType;
+        }
+
+        const vec3& GetColor() const {
+            return m_color;
+        }
+
+    protected:
         std::string m_name;
+        DrawMode m_drawMode;
+        PrimitiveType m_primitiveType;
+        vec3 m_color;
     };
 
     template<typename VertexType>
@@ -33,10 +54,12 @@ namespace renderer {
     public:
         ObjectBase() = delete;
 
-        explicit ObjectBase(const std::string &name, DrawMode mode = DrawMode::DYNAMIC)
-        :Object(name), m_drawMode(mode){
+        explicit ObjectBase(const std::string &name,
+                            DrawMode mode = DrawMode::DYNAMIC,
+                            PrimitiveType type = PrimitiveType::TRIANGLE,
+                            vec3 color = vec3(-1))
+        :Object(name, mode, type, color){
             m_VAO = GLVertexArray();
-            m_drawMode = mode;
         }
 
         void SetPipelineData() override = 0;
@@ -49,15 +72,25 @@ namespace renderer {
             m_VAO.Bind();
         }
 
+        void UnBindVAO() override{
+            m_VAO.UnBind();
+        }
+
         void Draw() override {
-            glDrawElements(GL_TRIANGLES, m_vertices.size(), GL_UNSIGNED_INT, nullptr);
+            if(m_primitiveType == PrimitiveType::LINE){
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }else{
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+
+            glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
         }
 
     public:
         std::vector<VertexType> m_vertices;
         std::vector<unsigned int> m_indices;
         GLVertexArray m_VAO{};
-        DrawMode m_drawMode ;
+
     };
 
 

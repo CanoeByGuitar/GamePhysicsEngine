@@ -13,8 +13,8 @@ namespace renderer{
             std::abort();
         }
 
-        const auto width = 1280;
-        const auto height = 720;
+        const auto width = 800;
+        const auto height = 600;
 
         m_width = width;
         m_height = height;
@@ -45,13 +45,22 @@ namespace renderer{
 
     }
 
+    void RenderSystem::LoadStaticObjects(RenderSystem::RenderListIterator renderListBegin,
+                                         RenderSystem::RenderListIterator renderListEnd) {
+        auto begin = renderListBegin;
+        while(begin != renderListEnd){
+            auto objectPtr = *begin;
+            objectPtr->SetupVerticesBuffer();
+            objectPtr->SetPipelineData();
+            begin++;
+        }
+    }
+
     void RenderSystem::Update(const Camera &camera) {
         // Window size changed.
         if (Input::GetInstance().ShouldResize()) {
             m_width = Input::GetInstance().GetWidth();
             m_height = Input::GetInstance().GetHeight();
-            UpdateView(camera);
-
             glViewport(0, 0, m_width, m_height);
         }
 
@@ -76,7 +85,7 @@ namespace renderer{
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindBuffer(GL_UNIFORM_BUFFER, m_uboMatrices);
 
-        renderObjectsWithoutTextures(renderListBegin, renderListEnd);
+        renderObjectsNoTextures(renderListBegin, renderListEnd);
     }
 
     void RenderSystem::compileShaders() {
@@ -92,9 +101,9 @@ namespace renderer{
     }
 
     void RenderSystem::setDefaultState() {
-        glFrontFace(GL_CCW);
-        glCullFace(GL_BACK);
-        glEnable(GL_CULL_FACE);
+//        glFrontFace(GL_CCW);
+//        glCullFace(GL_BACK);
+//        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
@@ -108,8 +117,10 @@ namespace renderer{
 
     }
 
-    void RenderSystem::renderObjectsWithoutTextures(RenderSystem::RenderListIterator renderListBegin,
-                                                    RenderSystem::RenderListIterator renderListEnd) const {
+
+
+    void RenderSystem::renderObjectsNoTextures(RenderListIterator renderListBegin,
+                                               RenderListIterator renderListEnd) const {
         auto begin = renderListBegin;
         while(begin != renderListEnd){
 
@@ -117,14 +128,30 @@ namespace renderer{
             static auto& shader = m_shaderCache.at(objectPtr->GetObjName());
             shader.Bind();
             shader.SetUniform("model", glm::mat4(1.0f));
-            objectPtr->SetupVerticesBuffer();
-            objectPtr->SetPipelineData();
+            if(glm::all(glm::greaterThanEqual(objectPtr->GetColor(), vec3{0}))){
+                shader.SetUniform("color", objectPtr->GetColor());
+            }else{
+                shader.SetUniform("color", vec3(227,75,33) / 255.f);
+            }
+            if(objectPtr->GetDrawMode() != DrawMode::STATIC){
+                objectPtr->SetupVerticesBuffer();
+                objectPtr->SetPipelineData();
+            }
             objectPtr->BindVAO();
             objectPtr->Draw();
+            objectPtr->UnBindVAO();
 
             begin++;
         }
     }
+
+
+
+
+    void setColorUniform(const std::string &shaderName, vec3 color){
+
+    }
+
 
     void RenderSystem::setupTextureSamplers() {
         glGenSamplers(1, &m_samplerTexture);

@@ -19,8 +19,13 @@ namespace renderer {
         using AABB = geo::AABB;
 
     public:
-        Cube(const char* name, const AABB &bound, DrawMode mode = DrawMode::DYNAMIC)
-                : ObjectBase(name, mode), m_bound(bound) {}
+        Cube(const char* name,
+             const AABB &bound,
+             DrawMode mode = DrawMode::DYNAMIC,
+             PrimitiveType type = PrimitiveType::TRIANGLE,
+             vec3 color = vec3(-1))
+                : ObjectBase(name, mode, type, color), m_bound(bound)
+                {}
 
         void SetPipelineData() override {
             m_VAO.Init();
@@ -40,10 +45,11 @@ namespace renderer {
         }
 
         void SetupVerticesBuffer() override {
+            m_vertices.clear();
             m_vertices.reserve(8);
-            for (int i = -1; i <= 1; i += 2) {
-                for (int j = -1; j <= 1; j += 2) {
-                    for (int k = -1; k <= 1; k += 2) {
+            for (int i : {-1, 1}) {
+                for (int j : {-1, 1}) {
+                    for (int k : {-1, 1}) {
                         auto position = m_bound.position;
                         auto halfSize = m_bound.halfSize;
                         m_vertices.push_back({{position + vec3(i, j, k) * halfSize}});
@@ -51,6 +57,7 @@ namespace renderer {
                 }
             }
 
+            if(m_indices.empty())
             m_indices = std::vector<unsigned int>({
                                                           1, 5, 7,
                                                           1, 7, 3,

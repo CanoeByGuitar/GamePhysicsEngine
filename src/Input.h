@@ -8,7 +8,7 @@
 #include <functional>
 #include <array>
 #include <Base/Log.h>
-
+#include <GLFW/glfw3.h>
 
 class Input{
 public:
@@ -25,6 +25,7 @@ public:
         m_mouseMoved = false;
         m_shouldResize = false;
         std::copy(m_keys.cbegin(), m_keys.cend(), m_prevKeys.begin());
+
     }
 
     bool IsKeyPressed(const std::size_t key) const {
@@ -35,6 +36,10 @@ public:
     bool IsKeyHeld(const std::size_t key) const{
         PHY_ASSERT(key < 1024, "Key out of bound!");
         return m_keys[key];
+    }
+
+    bool IsMouseClicked(const std::size_t key) const {
+        return m_buttons[key];
     }
 
     bool MouseMoved() const {return m_mouseMoved;}
@@ -52,19 +57,38 @@ public:
         this->m_yPos = yPos;
     };
 
-    std::function<void(int, int, int, int)> keyPressed
-        = [&](auto key, auto scancode, auto action, auto mode){
-        if(key >= 0 && key < 1024){
-            switch (action) {
-                case 1:
-                    this->m_keys[key] = true;
+    std::function<void(int, int, int)> mouseClicked = [&](auto button, auto action, auto mode){
+        if(button >= 0 && button < 128){
+            switch (action){
+                case GLFW_PRESS:
+//                    PHY_INFO("press");
+                    m_buttons[button] = true;
                     break;
-                case 0:
-                    this->m_keys[key] = false;
+                case GLFW_RELEASE:
+                    m_buttons[button] = false;
+//                    PHY_INFO("release");
                     break;
             }
         }
     };
+
+    std::function<void(int, int, int, int)> keyPressed
+        = [&](auto key, auto scancode, auto action, auto mode){
+        if(key >= 0 && key < 1024){
+            switch (action) {
+                case GLFW_PRESS:
+                    this->m_keys[key] = true;
+//                    PHY_INFO("press");
+                    break;
+                case GLFW_RELEASE:
+                    this->m_keys[key] = false;
+//                    PHY_INFO("release");
+                    break;
+            }
+        }
+    };
+
+
 
     std::function<void(int, int)> windowResized
         = [&](auto width, auto height){
@@ -77,6 +101,7 @@ private:
     Input(){
         std::fill(m_keys.begin(), m_keys.end(), false);
         std::fill(m_prevKeys.begin(), m_prevKeys.end(), false);
+        std::fill(m_buttons.begin(), m_buttons.end(), false);
     }
 
 
@@ -84,6 +109,8 @@ private:
 private:
     std::array<bool, 1024> m_keys;
     std::array<bool, 1024> m_prevKeys;
+
+    std::array<bool, 128> m_buttons;
 
     bool m_mouseMoved = false;
     float m_xPos, m_yPos;

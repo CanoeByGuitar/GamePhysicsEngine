@@ -7,6 +7,7 @@
 
 #include <string>
 #include <filesystem>
+#include <Geometry/Geometry.h>
 
 
 class ResourceManager{
@@ -23,6 +24,9 @@ public:
 
     // Load a text file and return as a string
     std::string LoadTextFile(const std::filesystem::path& path) const;
+
+    geo::Model& LoadModelFileNoMaterial(const std::filesystem::path& path) const;
+
 private:
     ResourceManager() = default;
     ~ResourceManager() = default;

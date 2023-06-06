@@ -101,9 +101,17 @@ namespace geo{
         Mesh(): accelerator(nullptr) {}
     };
 
-    class Model{
+    struct Model{
+        std::vector<Mesh> m_meshes;
 
+        Model() = default;
     };
+
+
+
+
+
+
 
 
     void AccelerateMesh(Mesh &mesh);

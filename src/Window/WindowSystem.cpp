@@ -26,8 +26,8 @@ GLFWwindow *WindowSystem::Init() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    const auto width = 1280;
-    const auto height = 720;
+    const auto width = 800;
+    const auto height = 600;
 
     m_window = glfwCreateWindow(width, height, "PhysicEngine", nullptr, nullptr);
     PHY_ASSERT(m_window, "Failed to start GLFW!")
@@ -41,15 +41,15 @@ GLFWwindow *WindowSystem::Init() {
 void WindowSystem::Update() {
     glfwPollEvents();
 
-    if (Input::GetInstance().IsKeyPressed(GLFW_KEY_TAB)) {
-        m_showCursor = !m_showCursor;
-        if (m_showCursor) {
-            EnableCursor();
-        } else {
-            DisableCursor();
-        }
-
-    }
+//    if (Input::GetInstance().IsKeyPressed(GLFW_KEY_TAB)) {
+//        m_showCursor = !m_showCursor;
+//        if (m_showCursor) {
+//            EnableCursor();
+//        } else {
+//            DisableCursor();
+//        }
+//
+//    }
     // Check if the window needs to be closed
     if (Input::GetInstance().IsKeyPressed(GLFW_KEY_ESCAPE) || glfwWindowShouldClose(m_window)) {
         m_shouldWindowClose = true;
