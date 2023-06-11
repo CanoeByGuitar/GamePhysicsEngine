@@ -33,15 +33,40 @@ float framesPerSecond(const float frameTimeMs){
 
 
 
-Engine::Engine(const std::shared_ptr<Scene> &scene) {
+Engine::Engine(const std::vector<Actor*>& world, GuiSystem* gui)
+:m_gui(gui), m_world(world)
+{
+
+}
+
+void Engine::Init() {
     PHY_INFO("Engine starting up...");
+
+    PHY_INFO("Loading world actors...");
+
 
     PHY_INFO("Initializing window...");
     auto* window = m_window.Init();
     connectWindowInstanceToInput(window);
 
+
+
+    PHY_INFO("Initializing physics...");
+    m_physics = new PhysicsSystem();
+//    m_physics = new ThreeBodySystem();
+    for(auto& actor : m_world){
+        if(actor->m_physicsComponent){
+            m_physics->AddObject(actor->m_physicsComponent->object);
+        }
+
+    }
+
+
     PHY_INFO("Initializing renderer...");
-    m_scene = scene;
+    m_scene = std::make_shared<Scene>();
+    for(auto& actor : m_world){
+        m_scene->AddObject(actor->m_renderComponent->object);
+    }
     m_renderer.Init();
 
     auto renderList = m_scene->GetObjects();
@@ -49,6 +74,8 @@ Engine::Engine(const std::shared_ptr<Scene> &scene) {
 
     m_renderer.SetProjectionMatrix(m_camera);
 
+    PHY_INFO("Initializing gui...");
+    m_gui->Init(m_window.m_window);
 }
 
 void Engine::Execute() {
@@ -58,6 +85,7 @@ void Engine::Execute() {
     });
 
     while (!m_window.ShouldClose()){
+        m_window.Update();
         timer.Update((float)glfwGetTime());
         if(hasOneSecondPassed){
             // TODO: print some info every one second including FPS
@@ -65,15 +93,20 @@ void Engine::Execute() {
         }
         auto dt = timer.GetDelta();
 
-        m_window.Update();
-        const auto& [width, height] = m_window.GetFramebufferDims();
+        ///////////// physics
+        m_physics->Update(dt);
 
+        ///////////// renderer
         m_camera.Update(dt);
         m_renderer.Update(m_camera);
-
         auto renderList = m_scene->GetObjects();
         m_renderer.Render(m_camera, renderList.cbegin(), renderList.cend());
+
+
+        //////////// Gui
+        m_gui->Draw(m_window.m_window);
 
         m_window.SwapBuffers();
     }
 }
+

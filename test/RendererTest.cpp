@@ -13,7 +13,7 @@ using namespace renderer;
 int main() {
     /////// cube
     auto cube = std::make_shared<Cube>("test",
-                                       geo::AABB({0, 0, 0}, {1, 1, 1}),
+                                       std::make_shared<geo::AABB>(vec3{0.f}, vec3{1.f}),
                                        DrawMode::STATIC,
                                        PrimitiveType::LINE,
                                        vec3{-1.f});

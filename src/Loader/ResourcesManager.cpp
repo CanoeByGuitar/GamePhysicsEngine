@@ -45,6 +45,7 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
                                                       );
                 geoMesh.triangles.push_back(tri);
             }
+            geoMesh.bound = geo::GetBound(geoMesh.triangles);
             ret->m_meshes.push_back(geoMesh);
         }
     }

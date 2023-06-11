@@ -9,6 +9,11 @@
 #include <cmath>
 
 namespace geo{
+
+    struct GeometryBase{
+
+    };
+
     struct Line{
         vec3 start;
         vec3 end;
@@ -35,6 +40,7 @@ namespace geo{
         vec3 halfSize;
         AABB() = default;
         AABB(const vec3& p, const vec3& s): position(p), halfSize(s){}
+
     };
 
     struct OBB{
@@ -98,7 +104,7 @@ namespace geo{
         BVHNode* accelerator;
         AABB bound;
 
-        Mesh(): accelerator(nullptr) {}
+        Mesh():accelerator(nullptr){}
     };
 
     struct Model{
@@ -110,15 +116,11 @@ namespace geo{
 
 
 
-
-
-
-
     void AccelerateMesh(Mesh &mesh);
 
     void RecursiveBuildBVH(BVHNode* node, int kThreshold);
 
-    void TraverseBVH(BVHNode* node);
+    void TraverseBVH(BVHNode *node, std::unordered_map<int, std::vector<BVHNode*>> &boundMap);
 
     inline vec3 GetMin(const AABB& aabb){
         return aabb.position - aabb.halfSize;

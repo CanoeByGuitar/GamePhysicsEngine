@@ -10,6 +10,10 @@
 #include <Base/Log.h>
 #include <GLFW/glfw3.h>
 
+
+
+
+
 class Input{
 public:
 
@@ -58,7 +62,7 @@ public:
     };
 
     std::function<void(int, int, int)> mouseClicked = [&](auto button, auto action, auto mode){
-        if(button >= 0 && button < 128){
+        if(m_mouseClickEnabled && button >= 0 && button < 128){
             switch (action){
                 case GLFW_PRESS:
 //                    PHY_INFO("press");
@@ -70,6 +74,14 @@ public:
                     break;
             }
         }
+    };
+
+    std::function<void()> enableMouse = [&](){
+        m_mouseClickEnabled = true;
+    };
+
+    std::function<void()> disableMouse = [&](){
+        m_mouseClickEnabled = false;
     };
 
     std::function<void(int, int, int, int)> keyPressed
@@ -117,6 +129,8 @@ private:
 
     bool m_shouldResize = false;
     std::size_t m_width, m_height;
+
+    bool m_mouseClickEnabled = true;
 
 };
 

@@ -5,7 +5,7 @@ file(GLOB GUI_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(Gui SHARED ${GUI_HEADER} ${GUI_SOURCES})
-target_link_libraries(Gui PUBLIC Base)
+target_link_libraries(Gui PUBLIC Base Imgui)
 
 if(APPLE)
     #   OPENGL

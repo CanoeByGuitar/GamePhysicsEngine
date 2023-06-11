@@ -39,7 +39,7 @@ public:
     std::pair<int, int> GetFramebufferDims() const;
 
 
-private:
+public:
     GLFWwindow* m_window = nullptr;
     bool m_shouldWindowClose = false;
     bool m_showCursor = false;

@@ -11,8 +11,6 @@
 #include "Camera.h"
 
 
-
-
 namespace renderer{
     class Scene;
 //    class GLShaderProgram;

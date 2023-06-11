@@ -26,8 +26,8 @@ GLFWwindow *WindowSystem::Init() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    const auto width = 800;
-    const auto height = 600;
+    const auto width = 1280;
+    const auto height = 720;
 
     m_window = glfwCreateWindow(width, height, "PhysicEngine", nullptr, nullptr);
     PHY_ASSERT(m_window, "Failed to start GLFW!")

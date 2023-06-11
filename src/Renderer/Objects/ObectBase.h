@@ -26,6 +26,19 @@ namespace renderer {
         virtual void UnBindVAO() = 0;
         virtual void Draw() = 0;
 
+        void SetColor(const vec3& color){
+            m_color = color;
+        };
+
+        void SetDrawMode(DrawMode mode){
+            m_drawMode = mode;
+        }
+
+        void SetPrimitiveType(PrimitiveType type){
+            m_primitiveType = type;
+        }
+
+
         std::string GetObjName() const{
             return m_name;
         }
@@ -42,11 +55,17 @@ namespace renderer {
             return m_color;
         }
 
+
+    public:
+        bool isVisible = true;
+
+
     protected:
         std::string m_name;
         DrawMode m_drawMode;
         PrimitiveType m_primitiveType;
         vec3 m_color;
+
     };
 
     template<typename VertexType>
@@ -85,6 +104,7 @@ namespace renderer {
 
             glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
         }
+
 
     public:
         std::vector<VertexType> m_vertices;

@@ -20,7 +20,7 @@ namespace renderer {
 
     public:
         Cube(const char* name,
-             const AABB &bound,
+             const std::shared_ptr<AABB> &bound,
              DrawMode mode = DrawMode::DYNAMIC,
              PrimitiveType type = PrimitiveType::TRIANGLE,
              vec3 color = vec3(-1))
@@ -50,35 +50,51 @@ namespace renderer {
             for (int i : {-1, 1}) {
                 for (int j : {-1, 1}) {
                     for (int k : {-1, 1}) {
-                        auto position = m_bound.position;
-                        auto halfSize = m_bound.halfSize;
+                        auto position = m_bound->position;
+                        auto halfSize = m_bound->halfSize;
                         m_vertices.push_back({{position + vec3(i, j, k) * halfSize}});
                     }
                 }
             }
 
-            if(m_indices.empty())
-            m_indices = std::vector<unsigned int>({
-                                                          1, 5, 7,
-                                                          1, 7, 3,
-                                                          5, 4, 6,
-                                                          5, 6, 7,
-                                                          0, 4, 6,
-                                                          0, 6, 2,
-                                                          1, 0, 2,
-                                                          1, 2, 3,
-                                                          3, 7, 6,
-                                                          3, 6, 2,
-                                                          1, 5, 4,
-                                                          1, 4, 0});
+            if(m_primitiveType == PrimitiveType::TRIANGLE && m_indices.empty()){
+                m_indices = std::vector<unsigned int>({
+                                                              1, 5, 7,
+                                                              1, 7, 3,
+                                                              5, 4, 6,
+                                                              5, 6, 7,
+                                                              0, 4, 6,
+                                                              0, 6, 2,
+                                                              1, 0, 2,
+                                                              1, 2, 3,
+                                                              3, 7, 6,
+                                                              3, 6, 2,
+                                                              1, 5, 4,
+                                                              1, 4, 0});
+            }else if(m_indices.empty())
+                m_indices = std::vector<unsigned int>({0, 1, 1, 3, 3, 2, 2, 0,
+                                                       1, 5, 3, 7, 2, 6, 0, 4,
+                                                       4, 5, 5, 7, 7, 6, 6, 4});
         }
 
         void SetMaterial() override {
             PHY_ASSERT(1, "No Cube Material For now!");
         }
 
+
+        void Draw() override {
+            if(m_primitiveType == PrimitiveType::LINE){
+//                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+            }else{
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+            }
+
+        }
+
     private:
-        AABB m_bound;
+        std::shared_ptr<AABB> m_bound;
     };
 }
 

@@ -13,14 +13,17 @@
 #include <Renderer/RenderSystem.h>
 #include <Renderer/Scene.h>
 #include <Window/WindowSystem.h>
-
-
+#include "Actor.h"
+#include <Physic/PhysicsSystem.h>
+#include <GUI/GUISystem.h>
 class Engine{
     using Scene = renderer::Scene;
     using RenderSystem = renderer::RenderSystem;
 public:
-    explicit Engine(const std::shared_ptr<Scene>& scene);
+    explicit Engine(const std::vector<Actor*> &world, GuiSystem* gui = new GuiSystem);
+    void Init();
     void Execute();
+
 
 
 private:
@@ -28,10 +31,14 @@ private:
 
 
 private:
+    std::vector<Actor*> m_world;
+    std::shared_ptr<Scene> m_scene;
+
     WindowSystem m_window;
     RenderSystem m_renderer;
+    GuiSystem* m_gui;
 
-    std::shared_ptr<Scene> m_scene;
+    PhysicsSystem* m_physics;
     Camera m_camera;
 };
 
