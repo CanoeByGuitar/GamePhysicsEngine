@@ -4,6 +4,7 @@ file(GLOB LOAD_SOURCE
 
 file(GLOB LOAD_HEADER
         *.h
+        *.hpp
 )
 
 add_library(Loader SHARED ${LOAD_HEADER} ${LOAD_SOURCE})

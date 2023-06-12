@@ -46,7 +46,7 @@ public:
 public:
     std::shared_ptr<RenderComponent> m_renderComponent;
     std::shared_ptr<PhysicsComponent> m_physicsComponent;
-
+    void* m_geoPtrCopy;
 };
 
 template<typename T>
@@ -64,15 +64,17 @@ public:
 template<>
 class ActorBase<geo::AABB> : public Actor{
 public:
+    ActorBase<geo::AABB>() = default;
     explicit ActorBase<geo::AABB>(const std::shared_ptr<geo::AABB>& cube)
             :m_geometry(cube){
         m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
     }
 
     ActorBase<geo::AABB>(const std::string& name, const std::shared_ptr<geo::AABB>& cube)
             :m_name(name), m_geometry(cube){
         m_renderComponent = std::make_shared<RenderComponent>();
-
+        m_geoPtrCopy = m_geometry.get();
     }
 
 
@@ -108,11 +110,13 @@ public:
     explicit ActorBase<geo::Model>(const std::shared_ptr<geo::Model>& model)
             :m_geometry(model){
         m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
     }
 
     ActorBase<geo::Model>(const std::string& name, const std::shared_ptr<geo::Model>& model)
             :m_geometry(model), m_name(name){
         m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
     }
 
 

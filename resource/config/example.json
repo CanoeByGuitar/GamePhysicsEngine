@@ -1,0 +1,24 @@
+{
+  "objects": [
+    {
+      "name" : "ground",
+      "type" : "cube",
+      "pos" : [0, -1.2, 0],
+      "halfSize" : [100, 1.2, 100],
+      "shader_name" : "test",
+      "color" : [1, 0, 0],
+      "drawMode": "dynamic",
+      "primitiveType": "triangle",
+      "model_path": ""
+    },
+    {
+      "name" : "marry",
+      "type" : "model",
+      "shader_name" : "test",
+      "color" : [0, 0.8, 0.6],
+      "drawMode": "dynamic",
+      "primitiveType": "line",
+      "model_path": "/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/Marry/Marry.obj"
+    }
+  ]
+}

@@ -17,15 +17,14 @@
 #include <Base/Color.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <Base/ControlParam.h>
+#include <variant>
 
 using namespace renderer;
 
-
-
 using control::clear_color;
 
-auto ground_geo = std::make_shared<geo::AABB>(control::ground_pos, control::ground_halfSize);
-auto actor_ground = new ActorBase<geo::AABB>("test", ground_geo);
+std::shared_ptr<geo::AABB> ground_geo;
+ActorBase<geo::AABB>* actor_ground;
 
 std::unordered_map<std::shared_ptr<Object> , int> BVHLevelMap;
 std::unordered_map<geo::BVHNode*, std::shared_ptr<Object>> NodeMap;
@@ -35,6 +34,8 @@ namespace control{
 }
 
 geo::BVHNode* originNode;
+
+
 
 class MyGui : public GuiSystem {
 public:
@@ -119,34 +120,73 @@ public:
 };
 
 
+std::unordered_map<std::string, Actor*> GenWorldFromConfig(const std::filesystem::path& path){
+    std::unordered_map<std::string, Actor*> world;
+    auto config = ResourceManager::GetInstance().LoadJsonFile(path);
+    for(const auto& item : config){
+        auto attr = item.second;
+
+        Actor* actor = nullptr;
+        //////// obj type
+        auto type = std::get<std::string>(attr["type"]);
+        if(type == "cube"){
+            auto geoCube = std::make_shared<geo::AABB>(
+                    std::get<vec3>(attr["pos"]),
+                    std::get<vec3>(attr["halfSize"])
+                    );
+            actor = new ActorBase<geo::AABB>(
+                    std::get<std::string>(attr["shader_name"]),
+                    geoCube);
+        }else if(type == "model"){
+            auto geoModel = std::make_shared<geo::Model>(
+                    ResourceManager::GetInstance().LoadModelFileNoMaterial(
+                            std::get<std::string>(attr["model_path"])
+                    ));
+            actor = new ActorBase<geo::Model>(
+                    std::get<std::string>(attr["shader_name"]),
+                    geoModel);
+        }
+        PHY_ASSERT(actor, "Config error, Actor is null!")
+
+        ///////// obj renderer settings
+        actor->InitRenderObject();
+        actor->m_renderComponent->SetColor(std::get<vec3>(attr["color"]));
+        if(std::get<std::string>(attr["drawMode"])== "dynamic"){
+            actor->m_renderComponent->SetDrawMode(DYNAMIC);
+        }else{
+            actor->m_renderComponent->SetDrawMode(STATIC);
+        }
+        if(std::get<std::string>(attr["primitiveType"])== "triangle"){
+            actor->m_renderComponent->SetPrimitiveType(PrimitiveType::TRIANGLE);
+        }else{
+            actor->m_renderComponent->SetPrimitiveType(PrimitiveType::LINE);
+        }
+
+        world[item.first] = actor;
+    }
+    return world;
+}
+
+
 int main() {
     PHY_LEVEL_DEBUG
+    //////// world
     std::vector<Actor *> world;
+    world.reserve(300);
 
-    /////// Ground
-    actor_ground->InitRenderObject();
-    actor_ground->m_renderComponent->SetColor(control::ground_color);
-    actor_ground->m_renderComponent->SetDrawMode(DrawMode::DYNAMIC);
-    actor_ground->m_renderComponent->SetPrimitiveType(PrimitiveType::TRIANGLE);
+    auto nameObjectMap = GenWorldFromConfig("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/config/example.json");
+    for(auto & it : nameObjectMap){
+        world.push_back(it.second);
+    }
 
-    world.push_back(actor_ground);
+    ///////// for gui
+    ground_geo = std::shared_ptr<geo::AABB>(reinterpret_cast<geo::AABB*>(nameObjectMap["ground"]->m_geoPtrCopy));
+    actor_ground = dynamic_cast<ActorBase<geo::AABB> *>(nameObjectMap["ground"]);
 
-    ////// model
-    auto model = std::make_shared<geo::Model>(
-            ResourceManager::GetInstance().LoadModelFileNoMaterial(
-                    "/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/Marry/Marry.obj"
-            ));
-
-    auto actor_model = new ActorBase<geo::Model>("test", model);
-    world.push_back(actor_model);
-    actor_model->InitRenderObject();
-    actor_model->m_renderComponent->SetDrawMode(DrawMode::STATIC);
-    actor_model->m_renderComponent->SetPrimitiveType(PrimitiveType::TRIANGLE);
-    actor_model->m_renderComponent->SetColor({0.f, 0.8f, 0.6f});
-
-
+    /////// BVH
+    auto geoModel = reinterpret_cast<geo::Model*>(nameObjectMap["marry"]->m_geoPtrCopy);
     int index = 0;
-    for (auto &mesh: model->m_meshes) {
+    for (auto &mesh: geoModel->m_meshes) {
         geo::AccelerateMesh(mesh);
         std::unordered_map<int, std::vector<geo::BVHNode*>> boundMap;
 
@@ -156,8 +196,6 @@ int main() {
         if(index == 1){
             originNode = boundMap[0][0];
         }
-
-        /////// BVH
         for (auto &item: boundMap) {
             for (auto &node: item.second) {
                 auto aabb = std::make_shared<geo::AABB>(node->bound);
@@ -175,14 +213,6 @@ int main() {
         }
         index++;
     }
-
-
-
-    std::vector<Actor *> test_world(7);
-    for (int i = 0; i < 6; i++) {
-        test_world.push_back(world[i]);
-    }
-    test_world.push_back(world.back());
 
     auto gui = new MyGui;
     Engine engine(world, gui);

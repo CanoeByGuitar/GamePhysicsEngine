@@ -52,3 +52,49 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
 
     return *ret;
 }
+
+
+
+using JsonValueType = std::variant<vec3, float, std::string>;
+using ObjectsDictType = std::unordered_map<std::string, JsonValueType>;
+std::unordered_map<std::string, ObjectsDictType> ResourceManager::LoadJsonFile(const std::filesystem::path &path) const {
+    std::ifstream f(path);
+    json data = json::parse(f);
+
+    std::unordered_map<std::string, ObjectsDictType> config;
+    for(const auto& obj : data["objects"]){
+        ObjectsDictType dict;
+        std::string name;
+        for(auto it = obj.begin(); it != obj.end(); it++){
+            const auto& key = it.key();
+            const auto& value = it.value();
+            if(key == "name"){
+                name = value;
+            }else{
+                if(value.is_array()){
+                    if(value.size() == 3){
+                        vec3 temp;
+                        temp.x = value[0];
+                        temp.y = value[1];
+                        temp.z = value[2];
+                        dict[key] = temp;
+                    }else if(value.size() == 4){
+                        vec4 temp;
+                        temp.x = value[0];
+                        temp.y = value[1];
+                        temp.z = value[2];
+                        temp.w = value[3];
+                        dict[key] = temp;
+                    }
+                }else if(value.is_string()){
+                    dict[key] = value.get<std::string>();
+                }else if(value.is_number_float()){
+                    dict[key] = value.get<float>();
+                }
+            }
+        }
+        config[name] = dict;
+    }
+
+    return config;
+}
