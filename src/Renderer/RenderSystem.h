@@ -20,6 +20,8 @@ namespace renderer{
         using RenderListIterator = std::vector<ObjectPtr>::const_iterator;
 
     public:
+        RenderSystem();
+
         void Init();
 
         static void LoadStaticObjects(RenderListIterator renderListBegin,
@@ -63,15 +65,7 @@ namespace renderer{
         GLuint m_samplerTexture = 0;
         GLuint m_uboMatrices = 0;
 
-        std::pair<std::string, std::vector<ShaderStage>> m_shaders = {
-                "test",
-                {
-                        {"/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.frag",
-                         "fragment"},
-                        {"/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.vert",
-                         "vertex"}
-                }
-        };
+        std::pair<std::string, std::vector<ShaderStage>> m_shaders;
 
     };
 

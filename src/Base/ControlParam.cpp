@@ -15,3 +15,5 @@ namespace control{
     BVHSplitStrategy bvh_strategy = MID_TRIANGLE_PARTITION;
 
 }
+
+//const std::string ROOT_DIR = "/Users/wangchenhui/Dev/GamePhysicsInOneWeekend";

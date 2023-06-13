@@ -23,7 +23,8 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
     // *.obj file
     auto loader = objl::Loader();
     auto ret = new geo::Model;
-    if(loader.LoadFile(path)){
+    PHY_INFO("Load Model at : {}", std::string(std::filesystem::current_path()/"../../" / path));
+    if(loader.LoadFile(std::filesystem::current_path()/"../../" / path)){
         auto model = loader.LoadedMeshes;
         for(const auto& mesh : model){
             const auto& vertices = mesh.Vertices;
@@ -48,6 +49,8 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
             geoMesh.bound = geo::GetBound(geoMesh.triangles);
             ret->m_meshes.push_back(geoMesh);
         }
+    }else{
+        PHY_ERROR("Cannot load model file!");
     }
 
     return *ret;
@@ -58,7 +61,8 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
 using JsonValueType = std::variant<vec3, float, std::string>;
 using ObjectsDictType = std::unordered_map<std::string, JsonValueType>;
 std::unordered_map<std::string, ObjectsDictType> ResourceManager::LoadJsonFile(const std::filesystem::path &path) const {
-    std::ifstream f(path);
+    PHY_INFO("Load Json at : {}", std::string(std::filesystem::current_path()/"../../" / path));
+    std::ifstream f(std::filesystem::current_path()/"../../" / path);
     json data = json::parse(f);
 
     std::unordered_map<std::string, ObjectsDictType> config;

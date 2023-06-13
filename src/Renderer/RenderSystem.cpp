@@ -9,7 +9,20 @@
 
 using control::clear_color;
 
+
 namespace renderer{
+    RenderSystem::RenderSystem() {
+        m_shaders = {
+                "test",
+                {
+                        {std::filesystem::current_path()/"../../" / "resource/shader/test/test.frag",
+                         "fragment"},
+                        {std::filesystem::current_path()/"../../" / "resource/shader/test/test.vert",
+                         "vertex"}
+                }
+        };
+    }
+
     void RenderSystem::Init() {
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
             spdlog::info("Failed to initialize GLAD");

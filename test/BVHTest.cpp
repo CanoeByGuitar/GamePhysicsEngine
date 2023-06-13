@@ -72,14 +72,7 @@ public:
         ground_geo->halfSize = control::ground_halfSize;
 
 
-        ImGui::SliderInt("bvhLevel", &control::Show_Level, 0, 20);
-        for(const auto& item : BVHLevelMap){
-            if(item.second != control::Show_Level){
-                item.first->isVisible = false;
-            }else{
-                item.first->isVisible = true;
-            }
-        }
+
 
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
@@ -89,20 +82,34 @@ public:
         ImGui::ColorEdit3("ground color", (float *) &control::ground_color);
         actor_ground->m_renderComponent->SetColor(control::ground_color);
 
-        if (ImGui::Button("NextNode")) {
+        static bool isMultiBVHShow = false;
+
+        ImGui::Checkbox("isMultiBVHShow", &isMultiBVHShow);
+        if(isMultiBVHShow){
+            ImGui::SliderInt("bvhLevel", &control::Show_Level, 0, 20);
             for(const auto& item : BVHLevelMap){
-                item.first->isVisible = false;
+                if(item.second != control::Show_Level){
+                    item.first->isVisible = false;
+                }else{
+                    item.first->isVisible = true;
+                }
             }
-            if(!control::currNode) control::currNode = originNode;
-            else{
-                NodeMap[control::currNode]->isVisible = true;
-                control::currNode = control::currNode->left;
+        }else{
+            if (ImGui::Button("NextNode")) {
+                for(const auto& item : BVHLevelMap){
+                    item.first->isVisible = false;
+                }
+                if(!control::currNode) control::currNode = originNode;
+                else{
+                    NodeMap[control::currNode]->isVisible = true;
+                    control::currNode = control::currNode->left;
+                }
+                counter++;
             }
-            counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
         }
 
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame\n (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
@@ -168,13 +175,15 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(const std::filesystem
 }
 
 
+
 int main() {
     PHY_LEVEL_DEBUG
     //////// world
     std::vector<Actor *> world;
     world.reserve(300);
 
-    auto nameObjectMap = GenWorldFromConfig("/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/config/example.json");
+//    extern std::string ROOT_DIR;
+    auto nameObjectMap = GenWorldFromConfig("resource/config/example.json");
     for(auto & it : nameObjectMap){
         world.push_back(it.second);
     }
