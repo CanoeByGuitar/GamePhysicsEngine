@@ -174,7 +174,7 @@ int main() {
     std::vector<Actor *> world;
     world.reserve(300);
 
-    auto nameObjectMap = GenWorldFromConfig("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/config/example.json");
+    auto nameObjectMap = GenWorldFromConfig("/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/config/example.json");
     for(auto & it : nameObjectMap){
         world.push_back(it.second);
     }

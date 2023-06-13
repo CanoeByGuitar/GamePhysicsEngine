@@ -18,7 +18,7 @@
       "color" : [0, 0.8, 0.6],
       "drawMode": "dynamic",
       "primitiveType": "triangle",
-      "model_path": "/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/Marry/Marry.obj"
+      "model_path": "/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/models/Marry/Marry.obj"
     }
   ]
 }

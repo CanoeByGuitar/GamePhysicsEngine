@@ -65,12 +65,12 @@ public:
         if(m_mouseClickEnabled && button >= 0 && button < 128){
             switch (action){
                 case GLFW_PRESS:
-//                    PHY_INFO("press");
+//                    PHY_DEBUG("press");
                     m_buttons[button] = true;
                     break;
                 case GLFW_RELEASE:
                     m_buttons[button] = false;
-//                    PHY_INFO("release");
+//                    PHY_DEBUG("release");
                     break;
             }
         }
@@ -90,11 +90,11 @@ public:
             switch (action) {
                 case GLFW_PRESS:
                     this->m_keys[key] = true;
-//                    PHY_INFO("press");
+                    PHY_DEBUG("press: {}", key);
                     break;
                 case GLFW_RELEASE:
                     this->m_keys[key] = false;
-//                    PHY_INFO("release");
+                    PHY_DEBUG("release: {}", key);
                     break;
             }
         }

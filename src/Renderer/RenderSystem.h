@@ -15,7 +15,7 @@ namespace renderer{
     class Scene;
 //    class GLShaderProgram;
 
-    class RenderSystem{
+    class RenderSystem {
         using ObjectPtr = std::shared_ptr<Object>;
         using RenderListIterator = std::vector<ObjectPtr>::const_iterator;
 
@@ -23,35 +23,37 @@ namespace renderer{
         void Init();
 
         static void LoadStaticObjects(RenderListIterator renderListBegin,
-                               RenderListIterator renderListEnd);
+                                      RenderListIterator renderListEnd);
 
-        void Update(const Camera& camera);
+        void Update(const Camera &camera);
 
         //Release OpenGl resources
         void Shutdown() const;
 
-        void UpdateView(const Camera& camera);
+        void UpdateView(const Camera &camera);
 
-        void SetProjectionMatrix(const Camera& camera);
+        void SetProjectionMatrix(const Camera &camera);
 
 
-        void Render(const Camera& camera,
+        void Render(const Camera &camera,
                     RenderListIterator renderListBegin,
                     RenderListIterator renderListEnd);
 
 
     private:
         void compileShaders();
+
         void setDefaultState();
-        void renderObjectsWithTextures(GLShaderProgram& shader,
+
+        void renderObjectsWithTextures(GLShaderProgram &shader,
                                        RenderListIterator renderListBegin,
                                        RenderListIterator renderListEnd) const;
+
         void renderObjectsNoTextures(RenderListIterator renderListBegin,
                                      RenderListIterator renderListEnd) const;
 
 
         void setupTextureSamplers();
-
 
 
     private:
@@ -60,17 +62,19 @@ namespace renderer{
         glm::mat4 m_projMatrix;
         GLuint m_samplerTexture = 0;
         GLuint m_uboMatrices = 0;
+
         std::pair<std::string, std::vector<ShaderStage>> m_shaders = {
-              "test",
-              {
-                      {"/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.frag",
-                                  "fragment"},
-                      {"/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.vert",
-                       "vertex"}
-              }
+                "test",
+                {
+                        {"/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.frag",
+                         "fragment"},
+                        {"/home/chenhui/Dev/GamePhysicsInOneWeekend/resource/shader/test/test.vert",
+                         "vertex"}
+                }
         };
 
     };
+
 
 }
 
