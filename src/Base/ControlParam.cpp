@@ -12,4 +12,6 @@ namespace control{
     vec3 ground_halfSize = vec3(100, 1.2, 100);
     int Show_Level = 10;
 
+    BVHSplitStrategy bvh_strategy = MID_TRIANGLE_PARTITION;
+
 }

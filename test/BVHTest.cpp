@@ -72,14 +72,14 @@ public:
         ground_geo->halfSize = control::ground_halfSize;
 
 
-//        ImGui::SliderInt("bvhLevel", &control::Show_Level, 0, 20);
-//        for(const auto& item : BVHLevelMap){
-//            if(item.second != control::Show_Level){
-//                item.first->isVisible = false;
-//            }else{
-//                item.first->isVisible = true;
-//            }
-//        }
+        ImGui::SliderInt("bvhLevel", &control::Show_Level, 0, 20);
+        for(const auto& item : BVHLevelMap){
+            if(item.second != control::Show_Level){
+                item.first->isVisible = false;
+            }else{
+                item.first->isVisible = true;
+            }
+        }
 
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
