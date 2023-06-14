@@ -16,12 +16,10 @@
 #include <Loader/ResourcesManager.h>
 #include <Base/Color.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <Base/ControlParam.h>
 #include <variant>
 
 using namespace renderer;
 
-using control::clear_color;
 
 std::shared_ptr<geo::AABB> ground_geo;
 ActorBase<geo::AABB>* actor_ground;
@@ -30,8 +28,18 @@ std::unordered_map<std::shared_ptr<Object> , int> BVHLevelMap;
 std::unordered_map<geo::BVHNode*, std::shared_ptr<Object>> NodeMap;
 
 namespace control{
-    geo::BVHNode* currNode;
+    static geo::BVHNode* currNode;
+    static vec3 ground_color = {0.2, 0.4, 0.6};
+    static vec3 ground_pos = vec3(0, -1.2, 0);
+    static vec3 ground_halfSize = vec3(100, 1.2, 100);
+    static int show_level = 10;
 }
+
+namespace control{
+    extern vec4 clear_color;
+    extern geo::BVHSplitStrategy bvh_strategy;
+}
+
 
 geo::BVHNode* originNode;
 
@@ -86,9 +94,9 @@ public:
 
         ImGui::Checkbox("isMultiBVHShow", &isMultiBVHShow);
         if(isMultiBVHShow){
-            ImGui::SliderInt("bvhLevel", &control::Show_Level, 0, 20);
+            ImGui::SliderInt("bvhLevel", &control::show_level, 0, 20);
             for(const auto& item : BVHLevelMap){
-                if(item.second != control::Show_Level){
+                if(item.second != control::show_level){
                     item.first->isVisible = false;
                 }else{
                     item.first->isVisible = true;

@@ -6,8 +6,14 @@
 #include "algorithm"
 #include <queue>
 #include <unordered_map>
-#include <Base/ControlParam.h>
 #include <algorithm>
+
+namespace control{
+    geo::BVHSplitStrategy bvh_strategy = geo::MID_TRIANGLE_PARTITION;
+}
+
+
+
 
 
 static int BVH_DEPTH = 0;

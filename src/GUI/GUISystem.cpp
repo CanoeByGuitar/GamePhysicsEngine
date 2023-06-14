@@ -5,9 +5,10 @@
 #include "GUISystem.h"
 #include <Base/Log.h>
 #include <Input.h>
-#include <Base/ControlParam.h>
 
-using control::clear_color;
+namespace control{
+    vec4 clear_color = vec4(0.45f, 0.55f, 0.60f, 1.00f);
+}
 
 void GuiSystem::Init(GLFWwindow *window) {
     const char* glsl_version = "#version 150";
@@ -80,7 +81,7 @@ void GuiSystem::Draw(GLFWwindow* window) {
         ImGui::Checkbox("Another Window", &show_another_window);
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit3("clear color", (float*)&control::clear_color); // Edit 3 floats representing a color
 
         if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;

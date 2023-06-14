@@ -8,7 +8,7 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Objects/*.cpp)
 
 add_library(Renderer SHARED ${RENDER_HEADER} ${RENDER_SOURCES})
-target_link_libraries(Renderer PUBLIC Base)
+target_link_libraries(Renderer PUBLIC Base Gui)
 
 if(APPLE)
     find_package(OpenGL REQUIRED)

@@ -10,6 +10,11 @@
 
 namespace geo{
 
+    enum BVHSplitStrategy : int{
+        MID_X_ALIAS,
+        MID_TRIANGLE_PARTITION
+    };
+
     struct GeometryBase{
 
     };

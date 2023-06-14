@@ -5,9 +5,10 @@
 #include "RenderSystem.h"
 #include "GLShaderProgramFactory.h"
 #include "Input.h"
-#include <Base/ControlParam.h>
 
-using control::clear_color;
+namespace control{
+    extern vec4 clear_color;
+}
 
 
 namespace renderer{
@@ -58,7 +59,7 @@ namespace renderer{
 
         glViewport(0, 0, width, height);
         
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClearColor(control::clear_color.x * control::clear_color.w, control::clear_color.y * control::clear_color.w, control::clear_color.z * control::clear_color.w, control::clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
 
@@ -101,9 +102,9 @@ namespace renderer{
     void RenderSystem::Render(const Camera &camera, RenderSystem::RenderListIterator renderListBegin,
                               RenderSystem::RenderListIterator renderListEnd) {
         setDefaultState();
-//        PHY_DEBUG("clear color in renderer: {} in addr: ", clear_color);
-//        std::cout << &clear_color << std::endl;
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+//        PHY_DEBUG("clear color in renderer: {} in addr: ", control::clear_color);
+//        std::cout << &control::clear_color << std::endl;
+        glClearColor(control::clear_color.x * control::clear_color.w, control::clear_color.y * control::clear_color.w, control::clear_color.z * control::clear_color.w, control::clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
         glBindBuffer(GL_UNIFORM_BUFFER, m_uboMatrices);
