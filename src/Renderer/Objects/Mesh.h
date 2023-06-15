@@ -9,22 +9,23 @@
 #include <Renderer/GLVertexArray.h>
 #include "ObectBase.h"
 
-namespace renderer{
-    struct BasicMeshVertex{
+namespace renderer {
+    struct BasicMeshVertex {
         vec3 position;
     };
 
-    class BasicMesh : public ObjectBase<BasicMeshVertex>{
+    class BasicMesh : public ObjectBase<BasicMeshVertex> {
     public:
-        BasicMesh(const char* name,
+        BasicMesh(const char *name,
                   const std::shared_ptr<geo::Mesh> &GeoMesh,
                   DrawMode mode = DrawMode::DYNAMIC,
                   PrimitiveType type = PrimitiveType::TRIANGLE,
                   vec3 color = vec3(-1))
-        : ObjectBase(name, mode, type, color), m_GeoMesh(GeoMesh){
+                : ObjectBase(name, mode, type, color), m_GeoMesh(GeoMesh) {
 
         }
-        void SetPipelineData() override{
+
+        void SetPipelineData() override {
             m_VAO.Init();
             m_VAO.Bind();
 
@@ -39,10 +40,10 @@ namespace renderer{
                                m_indices.data(),
                                m_drawMode);
 
-            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void*)0);
+            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void *) 0);
         };
 
-        void SetupVerticesBuffer() override{
+        void SetupVerticesBuffer() override {
             auto triangleNum = m_GeoMesh->triangles.size();
             m_vertices.clear();
             m_indices.clear();
@@ -50,15 +51,15 @@ namespace renderer{
             m_indices.reserve(triangleNum * 3);
 
             unsigned int idx = 0;
-            for(auto tri : m_GeoMesh->triangles){
-                for(int i = 0; i < 3; i++){
+            for (auto tri: m_GeoMesh->triangles) {
+                for (int i = 0; i < 3; i++) {
                     m_vertices.push_back({tri->points[i]});
                     m_indices.push_back(idx++);
                 }
             }
         };
 
-        void SetMaterial() override{
+        void SetMaterial() override {
             PHY_ASSERT(1, "No BasicMesh Material For now!");
         };
 
@@ -67,17 +68,18 @@ namespace renderer{
         std::shared_ptr<geo::Mesh> m_GeoMesh;
     };
 
-    class BasicModel : public ObjectBase<BasicMeshVertex>{
+    class BasicModel : public ObjectBase<BasicMeshVertex> {
     public:
-        BasicModel(const char* name,
-                  const std::shared_ptr<geo::Model> &model,
-                  DrawMode mode = DrawMode::DYNAMIC,
-                  PrimitiveType type = PrimitiveType::TRIANGLE,
+        BasicModel(const char *name,
+                   const std::shared_ptr<geo::Model> &model,
+                   DrawMode mode = DrawMode::DYNAMIC,
+                   PrimitiveType type = PrimitiveType::TRIANGLE,
                    vec3 color = vec3(-1))
-                : ObjectBase(name, mode, type, color), m_GeoModel(model){
+                : ObjectBase(name, mode, type, color), m_GeoModel(model) {
 
         }
-        void SetPipelineData() override{
+
+        void SetPipelineData() override {
             m_VAO.Init();
             m_VAO.Bind();
 
@@ -92,28 +94,38 @@ namespace renderer{
                                m_indices.data(),
                                m_drawMode);
 
-            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void*)0);
+            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void *) 0);
         };
 
-        void SetupVerticesBuffer() override{
+        void SetupVerticesBuffer() override {
             m_vertices.clear();
             m_indices.clear();
             unsigned int idx = 0;
-            for(const auto& mesh : m_GeoModel->m_meshes){
-                auto triangleNum = mesh.triangles.size();
-                m_vertices.reserve(m_vertices.size() + triangleNum * 3);
-                m_indices.reserve(m_indices.size() + triangleNum * 3);
-                for(auto tri : mesh.triangles){
-                    for(int i = 0; i < 3; i++){
-                        m_vertices.push_back({tri->points[i]});
-                        m_indices.push_back(idx++);
-                    }
+            for (const auto &mesh: m_GeoModel->m_meshes) {
+                m_indices.reserve(m_indices.size() + mesh.indices.size());
+                auto tempSize = m_vertices.size();
+                for (int i = 0; i < mesh.indices.size(); i++) {
+                    m_indices.push_back(mesh.indices[i] + tempSize);
                 }
+                m_vertices.reserve(m_vertices.size() + mesh.vertices.size());
+                for (int i = 0; i < mesh.vertices.size(); i++) {
+                    m_vertices.push_back({mesh.vertices[i]});
+                }
+
+//                auto triangleNum = mesh.triangles.size();
+//                m_vertices.reserve(m_vertices.size() + triangleNum * 3);
+//                m_indices.reserve(m_indices.size() + triangleNum * 3);
+//                for(auto tri : mesh.triangles){
+//                    for(int i = 0; i < 3; i++){
+//                        m_vertices.push_back({tri->points[i]});
+//                        m_indices.push_back(idx++);
+//                    }
+//                }
             }
 
         };
 
-        void SetMaterial() override{
+        void SetMaterial() override {
             PHY_ASSERT(1, "No BasicMesh Material For now!");
         };
 

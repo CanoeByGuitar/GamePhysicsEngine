@@ -106,7 +106,7 @@ namespace renderer {
         }
 
 
-    public:
+    protected:
         std::vector<VertexType> m_vertices;
         std::vector<unsigned int> m_indices;
         GLVertexArray m_VAO{};

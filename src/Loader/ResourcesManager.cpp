@@ -6,6 +6,7 @@
 #include "ResourcesManager.h"
 #include <Base/Log.h>
 #include "OBJ_Loader.h"
+#include <Base/DataStructure.h>
 
 void ResourceManager::ReleaseAllResources() {
 
@@ -19,7 +20,7 @@ std::string ResourceManager::LoadTextFile(const std::filesystem::path &path) con
     return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
 }
 
-geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path &path) const {
+geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path &path,  bool deduplicated) const {
     // *.obj file
     auto loader = objl::Loader();
     auto ret = new geo::Model;
@@ -46,6 +47,49 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(const std::filesystem::path
                                                       );
                 geoMesh.triangles.push_back(tri);
             }
+            auto m_vertices = std::vector<vec3>(vertices.size());
+            for(int i = 0; i < vertices.size(); i++){
+                m_vertices[i] = vec3(vertices[i].Position.X,
+                                           vertices[i].Position.Y,
+                                           vertices[i].Position.Z);
+            }
+            auto m_indices = indices;
+
+            // deduplicate
+            if(deduplicated){
+                std::unordered_map<glm::vec3, int, Vec3Hash> duplicate;
+                int duplicateNum = 0;
+                std::vector<vec3> newVertices;
+                newVertices.reserve(m_vertices.size());
+                std::vector<unsigned int> newIndices(m_indices.size());
+                for(int i = 0; i < m_vertices.size(); i++){
+                    if(duplicate.find(m_vertices[i]) == duplicate.end()){
+                        newVertices.push_back(m_vertices[i]);
+                        newIndices[i] = m_indices[i] - duplicateNum;
+                        duplicate[m_vertices[i]] = newIndices[i];
+                    }else{
+                        newIndices[i] = duplicate[m_vertices[i]];
+                        duplicateNum++;
+                    }
+                }
+                PHY_INFO("duplicateNum: {}", duplicateNum);
+                newVertices.shrink_to_fit();
+                m_vertices.swap(newVertices);
+                m_indices.swap(newIndices);
+                PHY_INFO("After deduplicate, there are totally {} vertices and {} indices.",
+                         m_vertices.size(), m_indices.size());
+                //    for(int i = 0; i < m_vertices.size(); i++){
+                //        PHY_INFO("({}): {}  ",i, m_vertices[i]);
+                //    }
+
+//                for(int i = 0; i < m_indices.size(); i++){
+//                    PHY_INFO("({}): {}  ",i, m_indices[i]);
+//                }
+            }
+
+
+            geoMesh.vertices = m_vertices;
+            geoMesh.indices = m_indices;
             geoMesh.bound = geo::GetBound(geoMesh.triangles);
             ret->m_meshes.push_back(geoMesh);
         }

@@ -60,6 +60,7 @@ void Engine::Init() {
         }
 
     }
+    m_physics->Init();
 
 
     PHY_INFO("Initializing renderer...");
@@ -95,6 +96,7 @@ void Engine::Execute() {
 
         ///////////// physics
         m_physics->Update(dt);
+//        m_physics->Finish();
 
         ///////////// renderer
         m_camera.Update(dt);

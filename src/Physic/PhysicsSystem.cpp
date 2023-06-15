@@ -11,6 +11,18 @@ void PhysicsSystem::AddObject(const std::shared_ptr<MovableObject> &object) {
 void PhysicsSystem::Update(float dt) {
     for(auto& body : m_objects){
         body->Move(dt);
+        body->Update(dt);
     }
 }
 
+void PhysicsSystem::Init() {
+    for(auto& object : m_objects){
+        object->Init();
+    }
+}
+
+void PhysicsSystem::Finish() {
+    for(auto& object : m_objects){
+        object->Finish();
+    }
+}

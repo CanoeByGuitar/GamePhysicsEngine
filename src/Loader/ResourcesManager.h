@@ -26,7 +26,7 @@ public:
     // Load a text file and return as a string
     std::string LoadTextFile(const std::filesystem::path& path) const;
 
-    geo::Model& LoadModelFileNoMaterial(const std::filesystem::path& path) const;
+    geo::Model& LoadModelFileNoMaterial(const std::filesystem::path& path, bool deduplicated = false) const;
 
     using json = nlohmann::json;
     using JsonValueType = std::variant<vec3, float, std::string>;

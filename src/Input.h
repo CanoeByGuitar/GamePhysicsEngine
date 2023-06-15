@@ -90,11 +90,11 @@ public:
             switch (action) {
                 case GLFW_PRESS:
                     this->m_keys[key] = true;
-                    PHY_DEBUG("press: {}", key);
+//                    PHY_DEBUG("press: {}", key);
                     break;
                 case GLFW_RELEASE:
                     this->m_keys[key] = false;
-                    PHY_DEBUG("release: {}", key);
+//                    PHY_DEBUG("release: {}", key);
                     break;
             }
         }

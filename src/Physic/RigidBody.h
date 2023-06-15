@@ -14,6 +14,18 @@ public:
     RigidBody(){}
     virtual ~RigidBody(){};
 
+    void Init() override {
+
+    }
+
+    void Finish() override {
+
+    }
+
+    void Update(float dt) override {
+
+    }
+
 };
 
 

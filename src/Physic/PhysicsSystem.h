@@ -12,7 +12,11 @@ public:
 
     void AddObject(const std::shared_ptr<MovableObject>& object);
 
+    virtual void Init();
     virtual void Update(float dt);
+
+    // to transfer phys data to geo data, which should be optimised
+    virtual void Finish();
 
 
 protected:

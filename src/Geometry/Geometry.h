@@ -105,7 +105,10 @@ namespace geo{
 
 
     struct Mesh{
+        // TODO: simplify data structure
         std::vector<Triangle*> triangles;
+        std::vector<vec3> vertices;
+        std::vector<unsigned int> indices;
         BVHNode* accelerator;
         AABB bound;
 

@@ -1,0 +1,13 @@
+{
+  "objects": [
+    {
+      "name" : "cloth",
+      "type" : "model",
+      "shader_name" : "test",
+      "color" : [0, 0.8, 0.6],
+      "drawMode": "dynamic",
+      "primitiveType": "line",
+      "model_path": "resource/models/cloth20x20.obj"
+    }
+  ]
+}

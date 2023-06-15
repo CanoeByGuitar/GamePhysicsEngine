@@ -34,3 +34,6 @@ target_link_libraries(BVH Engine)
 
 add_executable(JSON JSONTest.cpp)
 target_link_libraries(JSON Loader)
+
+add_executable(ClothData ClothDatasetTest.cpp)
+target_link_libraries(ClothData Engine)

@@ -11,6 +11,7 @@
 #include "Renderer/Objects/Cube.h"
 #include "Renderer/Objects/Mesh.h"
 #include "Physic/RigidBody.h"
+#include "Physic/Cloth.h"
 
 struct RenderComponent{
     std::shared_ptr<renderer::Object> object;
@@ -132,7 +133,11 @@ public:
 
     void UpdateRenderObject() override {}
 
-    void InitPhysicsObject() override{}
+    void InitPhysicsObject() override{
+        m_physicsComponent = std::make_shared<PhysicsComponent>();
+        m_physicsComponent->object = std::make_shared<Cloth>(
+                m_geometry);
+    }
 
 private:
     std::shared_ptr<geo::Model> m_geometry;
