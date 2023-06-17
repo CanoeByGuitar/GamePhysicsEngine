@@ -7,6 +7,7 @@
 #include <algorithm>
 
 static std::vector<vec3> last_x;
+static std::vector<vec3> init_x;
 static std::vector<vec3> last_v;
 static float mass = 1;
 void Cloth::SetupEdgeList() {
@@ -120,7 +121,9 @@ void Cloth::Update(float dt) {
     PHY_INFO("physic update: {} iters, {:.5f}s per iter", iteration, m_dt);
     for(int i = 0; i < iteration; i++){
 //        PHY_INFO("step {}", i);
+        TICK(substep)
         AdvanceOneSubstep();
+        TOCK(substep)
     }
 }
 
@@ -131,7 +134,7 @@ void Cloth::AdvanceOneSubstep(){
     last_x = m_vertices;
     last_v = m_velocities;
     for(int i = 0; i < m_vertices.size(); i++){
-        m_vertices[i] += m_dt * m_velocities[i];
+        m_velocities[i] *= 0.99; //damping
     }
 
     for(int k = 0; k < m_iter; k++){
@@ -152,17 +155,16 @@ std::vector<vec3> Cloth::SolveLinearSystem() {
     std::vector<vec3> g(m_vertices.size());
     for(int i = 0; i < m_vertices.size(); i++){
 
-        g[i] = -1 / (m_dt * m_dt) * mass *
-                (m_vertices[i] - last_x[i] - m_dt * last_v[i])
+        g[i] = - mass * (m_vertices[i] - (last_x[i] + m_dt * last_v[i])) / (m_dt * m_dt)
                 + mass * vec3(0, -9.8, 0);
 
-        for(int j = 0; j < m_edgeList.size(); j++){
-            auto a = m_edgeList[j].second;
-            auto b = m_edgeList[j].first;
-            auto pa = m_vertices[m_edgeList[j].second];
-            auto pb = m_vertices[m_edgeList[j].first];
+        for(int e = 0; e < m_edgeList.size(); e++){
+            auto a = m_edgeList[e].second;
+            auto b = m_edgeList[e].first;
+            auto pa = m_vertices[m_edgeList[e].second];
+            auto pb = m_vertices[m_edgeList[e].first];
 
-            vec3 f =  -m_k * (glm::length(pa - pb) - m_L[j]) * glm::normalize(pa - pb);
+            vec3 f = -m_springK * (glm::length(pa - pb) - m_L[e]) * glm::normalize(pa - pb);
             // fa = fa + f  fb = fb - f
             // ga = ga + fa  gb = gv - fb
             g[a] = g[a] + f;
@@ -172,8 +174,7 @@ std::vector<vec3> Cloth::SolveLinearSystem() {
 
     // simplified by taking H as diagnol elsewise should use jacobbi
     for(int i = 0; i < m_vertices.size(); i++){
-        int k = 1;
-        g[i] /= (mass / (m_dt * m_dt) +  4 * k);
+        g[i] /= (mass / (m_dt * m_dt) + 4.f * m_springK);
     }
 
     return g;

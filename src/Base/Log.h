@@ -9,7 +9,10 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <chrono>
 
+#define TICK(x) auto bench_##x = std::chrono::system_clock::now();
+#define TOCK(x) spdlog::info("-------{}: {:.1f}ms", #x, std::chrono::duration<double, std::milli>(std::chrono::system_clock::now() - bench_##x).count());
 
 using vec2 = glm::vec2;
 using vec3 = glm::vec3;

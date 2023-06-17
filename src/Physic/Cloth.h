@@ -45,7 +45,7 @@ private:
     float m_dt = 1.2e-3; // substep
     int m_iter = 8; // newton max iters
     float m_epsilon = 1e-6; // newton delta x threshould
-    float m_k = 200; // spring force
+    float m_springK = 200; // spring force
 };
 
 #endif //GAMEPHYSICSINONEWEEKEND_CLOTH_H
