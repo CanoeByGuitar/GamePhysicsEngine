@@ -25,12 +25,12 @@ using namespace renderer;
 
 
 namespace control{
-
 }
 
 namespace control{
     extern vec4 clear_color;
     extern geo::BVHSplitStrategy bvh_strategy;
+    extern bool start;
 }
 
 
@@ -55,6 +55,10 @@ public:
         static int counter = 0;
 
         ImGui::Begin("Cloth");                          // Create a window called "Hello, world!" and append into it.
+
+        if (ImGui::Button("start/stop")){
+            control::start = !control::start;
+        }
 
         if (ImGui::IsWindowHovered()) {
             Input::GetInstance().disableMouse();

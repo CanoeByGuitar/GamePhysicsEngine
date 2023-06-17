@@ -5,6 +5,10 @@
 #include "Engine.h"
 #include "timer.h"
 
+namespace control{
+    bool start = false;
+}
+
 void Engine::connectWindowInstanceToInput(GLFWwindow *window) {
     const auto resizeCallback = [](GLFWwindow* w, auto width, auto height) {
         Input::GetInstance().windowResized(width, height);
@@ -93,10 +97,14 @@ void Engine::Execute() {
             hasOneSecondPassed = false;
         }
         auto dt = timer.GetDelta();
-
+//        PHY_INFO("dt:{}", dt);
         ///////////// physics
-        m_physics->Update(dt);
-//        m_physics->Finish();
+        if(control::start){
+            m_physics->Update(dt);
+            m_physics->Finish();
+//            control::start = false;
+        }
+
 
         ///////////// renderer
         m_camera.Update(dt);

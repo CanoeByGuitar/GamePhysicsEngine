@@ -6,7 +6,9 @@
 #include <cmath>
 #include <algorithm>
 
-
+static std::vector<vec3> last_x;
+static std::vector<vec3> last_v;
+static float mass = 1;
 void Cloth::SetupEdgeList() {
     for (const auto &mesh: m_model->m_meshes) {
         m_indices.reserve(m_indices.size() + mesh.indices.size());
@@ -17,6 +19,7 @@ void Cloth::SetupEdgeList() {
         m_vertices.reserve(m_vertices.size() + mesh.vertices.size());
         m_vertices.insert(m_vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
     }
+    m_velocities = std::vector<vec3>(m_vertices.size(), vec3(0));
     PHY_INFO("Models have {} meshes, there are totally {} vertices and {} indices.",
              m_model->m_meshes.size(), m_vertices.size(), m_indices.size());
 
@@ -48,6 +51,7 @@ void Cloth::SetupEdgeList() {
         }
     });
 
+    // gen edegList from triple list
     int i = 0;
     unsigned int temp0 = 0;
     unsigned int temp1 = 0;
@@ -56,20 +60,32 @@ void Cloth::SetupEdgeList() {
         if(TripleList[i][0] == temp0 && TripleList[i][1] == temp1){
 
         }else{
-            m_edgeList.emplace_back(m_vertices[TripleList[i][0]],
-                                           m_vertices[TripleList[i][1]]);
+            m_edgeList.emplace_back(TripleList[i][0],
+                                    TripleList[i][1]);
             temp0 = TripleList[i][0];
             temp1 = TripleList[i][1];
         }
         i++;
     }
+
+    // spring initial length
+    auto a = m_vertices[m_indices[0]];
+    auto b = m_vertices[m_indices[1]];
+
+    m_L.resize(m_edgeList.size());
+    for(int idx = 0; idx < m_L.size(); idx++){
+        m_L[idx] = glm::distance(m_vertices[m_edgeList[idx].first],
+                                 m_vertices[m_edgeList[idx].second]);
+    }
 }
 
 void Cloth::Init() {
     this->SetupEdgeList();
+    int c = 0;
 }
 
 void Cloth::Finish() {
+    m_model->m_meshes[0].vertices = m_vertices;
 //    auto& triVec = m_model->m_meshes[0].triangles;
 //    triVec.clear();
 //    triVec.reserve(m_indices.size() / 3);
@@ -99,8 +115,68 @@ void Cloth::Finish() {
 }
 
 void Cloth::Update(float dt) {
-
+    dt = 0.016;
+    int iteration = std::ceil(dt / m_dt);
+    PHY_INFO("physic update: {} iters, {:.5f}s per iter", iteration, m_dt);
+    for(int i = 0; i < iteration; i++){
+//        PHY_INFO("step {}", i);
+        AdvanceOneSubstep();
+    }
 }
 
+
+void Cloth::AdvanceOneSubstep(){
+    // nenton iteration argmin F(x)
+    // initial guess(x0 = x0 or x0 = x0 + dt * v0)
+    last_x = m_vertices;
+    last_v = m_velocities;
+    for(int i = 0; i < m_vertices.size(); i++){
+        m_vertices[i] += m_dt * m_velocities[i];
+    }
+
+    for(int k = 0; k < m_iter; k++){
+//        PHY_INFO("Newton iter: {}", k);
+        auto dx = SolveLinearSystem();
+        for(int i = 0; i < m_vertices.size(); i++){
+            if(i == 41 || i == 440 ) continue;
+            m_vertices[i] += dx[i];
+        }
+    }
+    for(int i = 0; i < m_vertices.size(); i++){
+        m_velocities[i] = (m_vertices[i] - last_x[i]) / m_dt;
+    }
+}
+
+std::vector<vec3> Cloth::SolveLinearSystem() {
+    // g : gredient * (-1)
+    std::vector<vec3> g(m_vertices.size());
+    for(int i = 0; i < m_vertices.size(); i++){
+
+        g[i] = -1 / (m_dt * m_dt) * mass *
+                (m_vertices[i] - last_x[i] - m_dt * last_v[i])
+                + mass * vec3(0, -9.8, 0);
+
+        for(int j = 0; j < m_edgeList.size(); j++){
+            auto a = m_edgeList[j].second;
+            auto b = m_edgeList[j].first;
+            auto pa = m_vertices[m_edgeList[j].second];
+            auto pb = m_vertices[m_edgeList[j].first];
+
+            vec3 f =  -m_k * (glm::length(pa - pb) - m_L[j]) * glm::normalize(pa - pb);
+            // fa = fa + f  fb = fb - f
+            // ga = ga + fa  gb = gv - fb
+            g[a] = g[a] + f;
+            g[b] = g[b] - f;
+        }
+    }
+
+    // simplified by taking H as diagnol elsewise should use jacobbi
+    for(int i = 0; i < m_vertices.size(); i++){
+        int k = 1;
+        g[i] /= (mass / (m_dt * m_dt) +  4 * k);
+    }
+
+    return g;
+}
 
 

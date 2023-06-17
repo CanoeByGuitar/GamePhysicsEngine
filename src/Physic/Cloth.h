@@ -28,13 +28,24 @@ public:
 
     void SetupEdgeList();
 
+    void AdvanceOneSubstep();
+
+    std::vector<vec3> SolveLinearSystem();
+
 private:
     std::shared_ptr<geo::Model> m_model;
 
 
-    std::vector<vec3> m_vertices;
+    std::vector<vec3> m_vertices; // x
+    std::vector<vec3> m_velocities; // v
+    
     std::vector<unsigned int> m_indices;
-    std::vector<geo::Line> m_edgeList;
+    std::vector<std::pair<int, int>> m_edgeList;
+    std::vector<float> m_L; // initial length of spring
+    float m_dt = 1.2e-3; // substep
+    int m_iter = 8; // newton max iters
+    float m_epsilon = 1e-6; // newton delta x threshould
+    float m_k = 200; // spring force
 };
 
 #endif //GAMEPHYSICSINONEWEEKEND_CLOTH_H
