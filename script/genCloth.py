@@ -12,8 +12,8 @@ def generate_rectangle_obj_file(m, n, width, height, filename):
     for i in range(m_row + 1):
         for j in range(m_col + 1):
             # x, y, z of one vertex
-            vertices[3 * (i * (m_col + 1) + j) + 0] = float(i) / float(m_row)
-            vertices[3 * (i * (m_col + 1) + j) + 1] = float(j) / float(m_col)
+            vertices[3 * (i * (m_col + 1) + j) + 0] = float(i) / float(m_row) * width
+            vertices[3 * (i * (m_col + 1) + j) + 1] = float(j) / float(m_col) * height
             vertices[3 * (i * (m_col + 1) + j) + 2] = 0.0
 
     for i in range(m_row):
@@ -39,4 +39,4 @@ def generate_rectangle_obj_file(m, n, width, height, filename):
 
 
 # 示例用法
-generate_rectangle_obj_file(20, 20, 1, 1, 'rectangle.obj')
+generate_rectangle_obj_file(20, 20, 1, 1, 'cloth20x20(small).obj')
