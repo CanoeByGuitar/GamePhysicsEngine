@@ -25,15 +25,21 @@ using namespace renderer;
 
 
 namespace control{
+
 }
 
 namespace control{
     extern vec4 clear_color;
     extern geo::BVHSplitStrategy bvh_strategy;
     extern bool start;
+    extern vec3 center;
+    extern float radius;
 }
 
 
+std::shared_ptr<geo::Sphere> ball_geo;
+bool isBallMoving = false;
+float position = 0.2;
 
 
 class MyGui : public GuiSystem {
@@ -59,6 +65,26 @@ public:
         if (ImGui::Button("start/stop")){
             control::start = !control::start;
         }
+
+
+        if (ImGui::Button("move ball")){
+            isBallMoving = !isBallMoving;
+        }
+        if(isBallMoving){
+//            control::center.x = Input::GetInstance().GetMouseX();
+//            control::center.y = Input::GetInstance().GetMouseY();
+//            ball_geo->position = control::center;
+
+            ImGui::SliderFloat("ball center z", &position, 2, -2);
+            control::center = vec3(0.5, 0.5, position);
+            ball_geo->position = control::center;
+        }
+        static float radius;
+        ImGui::SliderFloat("ball radius", &radius, 0.01, 0.2);
+        control::radius = radius;
+        ball_geo->radius = control::radius;
+
+
 
         if (ImGui::IsWindowHovered()) {
             Input::GetInstance().disableMouse();
@@ -109,6 +135,15 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(const std::filesystem
             actor = new ActorBase<geo::Model>(
                     std::get<std::string>(attr["shader_name"]),
                     geoModel);
+        }else if(type == "sphere"){
+            auto geoSphere = std::make_shared<geo::Sphere>(
+                        std::get<vec3>(attr["center"]),
+                        std::get<float>(attr["radius"])
+                    );
+            actor = new ActorBase<geo::Sphere>(
+                    std::get<std::string>(attr["shader_name"]),
+                    geoSphere
+                    );
         }
         PHY_ASSERT(actor, "Config error, Actor is null!")
 
@@ -143,9 +178,12 @@ int main() {
     for(auto & it : nameObjectMap){
         world.push_back(it.second);
     }
-
     // Physic solver
-    world[0]->InitPhysicsObject();
+    nameObjectMap["cloth"]->InitPhysicsObject();
+    ball_geo = std::shared_ptr<geo::Sphere>(
+            reinterpret_cast<geo::Sphere*>(nameObjectMap["ball"]->m_geoPtrCopy)
+            );
+
 
 
     auto gui = new MyGui;

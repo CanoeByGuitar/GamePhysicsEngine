@@ -6,10 +6,15 @@
 #include <cmath>
 #include <algorithm>
 
+
+namespace control{
+    vec3 center = vec3(0);
+    float radius = 0.2;
+};
+
 static std::vector<vec3> last_x;
 static std::vector<vec3> init_x;
-static std::vector<vec3> last_v;
-static float mass = 1;
+
 void Cloth::SetupEdgeList() {
     for (const auto &mesh: m_model->m_meshes) {
         m_indices.reserve(m_indices.size() + mesh.indices.size());
@@ -82,7 +87,6 @@ void Cloth::SetupEdgeList() {
 
 void Cloth::Init() {
     this->SetupEdgeList();
-    int c = 0;
 }
 
 void Cloth::Finish() {
@@ -115,16 +119,39 @@ void Cloth::Finish() {
 
 }
 
+static int frame = 0;
 void Cloth::Update(float dt) {
-    dt = 0.016;
+    dt = 0.008;
     int iteration = std::ceil(dt / m_dt);
     PHY_INFO("physic update: {} iters, {:.5f}s per iter", iteration, m_dt);
+
+//    if(frame % 300 < 15){
+//        m_wind.x = -4;
+//    }else{
+//        m_wind.x = 8;
+//    }
+
     for(int i = 0; i < iteration; i++){
 //        PHY_INFO("step {}", i);
         TICK(substep)
         AdvanceOneSubstep();
         TOCK(substep)
+
+//        TICK(collision)
+        HandleCollision();
+//        TOCK(collision)
     }
+    frame++;
+}
+
+
+
+float computeNorm2(const std::vector<vec3>& dx){
+    float ret = 0;
+    for(int i = 0; i < dx.size(); i++){
+        ret += (dx[i].x * dx[i].x + dx[i].y * dx[i].y + dx[i].z * dx[i].z);
+    }
+    return ret;
 }
 
 
@@ -132,19 +159,23 @@ void Cloth::AdvanceOneSubstep(){
     // nenton iteration argmin F(x)
     // initial guess(x0 = x0 or x0 = x0 + dt * v0)
     last_x = m_vertices;
-    last_v = m_velocities;
+    init_x.resize(m_vertices.size()); // initial guess in newton
     for(int i = 0; i < m_vertices.size(); i++){
-        m_velocities[i] *= 0.99; //damping
+        m_velocities[i] *= 0.99;
+//        init_x[i] = m_vertices[i]; // x0 = x0
+        init_x[i] = m_vertices[i] + m_dt * m_velocities[i];  // x0 = x0 + dt * v0
     }
 
-    for(int k = 0; k < m_iter; k++){
-//        PHY_INFO("Newton iter: {}", k);
-        auto dx = SolveLinearSystem();
-        for(int i = 0; i < m_vertices.size(); i++){
-            if(i == 41 || i == 440 ) continue;
-            m_vertices[i] += dx[i];
+    for(int k = 0; k < m_iter; k++) {
+        auto negGradient = SolveLinearSystem();
+        for (int i = 0; i < m_vertices.size(); i++) {
+            if (i == 41 || i == 440) continue;
+            // simplified by taking H as diagnol elsewise should use jacobbi
+            m_vertices[i] += negGradient [i] / (m_mass / (m_dt * m_dt) + 4.f * m_springK);
         }
+//        PHY_INFO("iter : {},  residential: {}", k + 1, computeNorm2(dx));
     }
+
     for(int i = 0; i < m_vertices.size(); i++){
         m_velocities[i] = (m_vertices[i] - last_x[i]) / m_dt;
     }
@@ -155,8 +186,9 @@ std::vector<vec3> Cloth::SolveLinearSystem() {
     std::vector<vec3> g(m_vertices.size());
     for(int i = 0; i < m_vertices.size(); i++){
 
-        g[i] = - mass * (m_vertices[i] - (last_x[i] + m_dt * last_v[i])) / (m_dt * m_dt)
-                + mass * vec3(0, -9.8, 0);
+        g[i] = - m_mass * (m_vertices[i] - (last_x[i] + m_dt * m_velocities[i])) / (m_dt * m_dt)
+               + m_mass * m_gravity
+               + m_mass * m_wind;
 
         for(int e = 0; e < m_edgeList.size(); e++){
             auto a = m_edgeList[e].second;
@@ -164,7 +196,8 @@ std::vector<vec3> Cloth::SolveLinearSystem() {
             auto pa = m_vertices[m_edgeList[e].second];
             auto pb = m_vertices[m_edgeList[e].first];
 
-            vec3 f = -m_springK * (glm::length(pa - pb) - m_L[e]) * glm::normalize(pa - pb);
+//            vec3 f = - m_springK * (glm::length(pa - pb) - m_L[e]) * glm::normalize(pa - pb);
+            vec3 f = - m_springK * (1 - m_L[e] / glm::length(pa - pb)) * (pa - pb);
             // fa = fa + f  fb = fb - f
             // ga = ga + fa  gb = gv - fb
             g[a] = g[a] + f;
@@ -172,12 +205,19 @@ std::vector<vec3> Cloth::SolveLinearSystem() {
         }
     }
 
-    // simplified by taking H as diagnol elsewise should use jacobbi
-    for(int i = 0; i < m_vertices.size(); i++){
-        g[i] /= (mass / (m_dt * m_dt) + 4.f * m_springK);
-    }
-
     return g;
 }
 
+
+void Cloth::HandleCollision() {
+    using control::center;
+    using control::radius;
+    for(int i = 0;i < m_vertices.size(); i++){
+        if(glm::dot(m_vertices[i] - center,
+                    m_vertices[i] - center) < radius * radius){
+            m_velocities[i] += (center + radius * glm::normalize(m_vertices[i] - center) - m_vertices[i]) / m_dt;
+            m_vertices[i] =  center + radius * glm::normalize(m_vertices[i] - center);
+        }
+    }
+}
 

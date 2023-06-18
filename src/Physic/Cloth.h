@@ -32,6 +32,8 @@ public:
 
     std::vector<vec3> SolveLinearSystem();
 
+    void HandleCollision();
+
 private:
     std::shared_ptr<geo::Model> m_model;
 
@@ -42,10 +44,15 @@ private:
     std::vector<unsigned int> m_indices;
     std::vector<std::pair<int, int>> m_edgeList;
     std::vector<float> m_L; // initial length of spring
+
+    float m_mass = 1;
     float m_dt = 1.2e-3; // substep
-    int m_iter = 8; // newton max iters
-    float m_epsilon = 1e-6; // newton delta x threshould
+    int m_iter = 1; // newton max iters
+    float m_epsilon = 1e-2; // newton delta x threshould
     float m_springK = 200; // spring force
+
+    vec3 m_gravity = vec3(0, -9.8, 0);
+    vec3 m_wind = vec3(0, 0, 0);
 };
 
 #endif //GAMEPHYSICSINONEWEEKEND_CLOTH_H

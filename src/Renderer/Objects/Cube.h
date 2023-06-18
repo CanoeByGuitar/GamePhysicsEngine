@@ -12,7 +12,6 @@
 namespace renderer {
     struct CubeVertex {
         vec3 position;
-        vec3 color = {0, 0, 0};
     };
 
     class Cube : public ObjectBase<CubeVertex> {

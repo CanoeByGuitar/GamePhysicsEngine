@@ -36,7 +36,7 @@ private:
     void updateVectors();
 
 
-    vec3 m_position = vec3(0.f);
+    vec3 m_position = vec3(.5f, .5f, 2.f );
     vec3 m_front = vec3(0.f, 0.f, -1.0f);
     vec3 m_up = vec3(0.f, 1.f, 0.f);
     vec3 m_right;

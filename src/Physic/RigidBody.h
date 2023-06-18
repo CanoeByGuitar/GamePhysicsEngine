@@ -42,6 +42,19 @@ private:
     std::shared_ptr<geo::AABB> m_box;
 };
 
+class RigidBodySphere : public RigidBody{
+public:
+    RigidBodySphere(const std::shared_ptr<geo::Sphere>& sphere)
+            :m_sphere(sphere)
+    {
+
+    }
+
+    void Move(float dt) override;
+private:
+    std::shared_ptr<geo::Sphere> m_sphere;
+};
+
 
 
 

@@ -7,3 +7,7 @@
 void RigidBodyBox::Move(float dt) {
     m_box->position += (vel * dt);
 }
+
+void RigidBodySphere::Move(float dt) {
+
+}

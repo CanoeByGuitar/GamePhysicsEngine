@@ -7,7 +7,17 @@
       "color" : [0, 0.8, 0.6],
       "drawMode": "dynamic",
       "primitiveType": "line",
-      "model_path": "resource/models/cloth20x20.obj"
+      "model_path": "resource/models/cloth20x20(small).obj"
+    },
+    {
+      "name" : "ball",
+      "type" : "sphere",
+      "center": [-1, 0, 0],
+      "radius": 0.8,
+      "shader_name" : "test",
+      "color" : [1, 0, 0],
+      "drawMode": "dynamic",
+      "primitiveType": "line"
     }
   ]
 }

@@ -10,6 +10,7 @@
 #include <Renderer/Objects/ObectBase.h>
 #include "Renderer/Objects/Cube.h"
 #include "Renderer/Objects/Mesh.h"
+#include "Renderer/Objects/Sphere.h"
 #include "Physic/RigidBody.h"
 #include "Physic/Cloth.h"
 
@@ -145,5 +146,43 @@ private:
 };
 
 
+template<>
+class ActorBase<geo::Sphere> : public Actor{
+public:
+    explicit ActorBase<geo::Sphere>(const std::shared_ptr<geo::Sphere>& sphere)
+            :m_geometry(sphere){
+        m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
+    }
+
+    ActorBase<geo::Sphere>(const std::string& name, const std::shared_ptr<geo::Sphere>& sphere)
+            :m_geometry(sphere), m_name(name){
+        m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
+    }
+
+
+    void InitRenderObject() override {
+        m_renderComponent->object = std::make_shared<renderer::Sphere>(
+                m_name.c_str(),
+                m_geometry,
+                m_renderComponent->drawMode,
+                m_renderComponent->primitiveType,
+                m_renderComponent->color
+        );
+    }
+
+    void UpdateRenderObject() override {}
+
+    void InitPhysicsObject() override{
+        m_physicsComponent = std::make_shared<PhysicsComponent>();
+        m_physicsComponent->object = std::make_shared<RigidBodySphere>(
+                m_geometry);
+    }
+
+private:
+    std::shared_ptr<geo::Sphere> m_geometry;
+    std::string m_name = "test";
+};
 
 #endif //GAMEPHYSICSINONEWEEKEND_ACTOR_H
