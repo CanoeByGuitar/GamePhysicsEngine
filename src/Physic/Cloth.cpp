@@ -125,11 +125,11 @@ void Cloth::Update(float dt) {
     int iteration = std::ceil(dt / m_dt);
     PHY_INFO("physic update: {} iters, {:.5f}s per iter", iteration, m_dt);
 
-//    if(frame % 300 < 15){
-//        m_wind.x = -4;
-//    }else{
-//        m_wind.x = 8;
-//    }
+    if(frame % 100 < 15){
+        m_wind.x = -8;
+    }else{
+        m_wind.x = 12;
+    }
 
     for(int i = 0; i < iteration; i++){
 //        PHY_INFO("step {}", i);

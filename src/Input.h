@@ -24,32 +24,26 @@ public:
         static Input instance;
         return instance;
     };
-
     void Update(){
         m_mouseMoved = false;
         m_shouldResize = false;
         std::copy(m_keys.cbegin(), m_keys.cend(), m_prevKeys.begin());
 
     }
-
     bool IsKeyPressed(const std::size_t key) const {
         PHY_ASSERT(key < 1024, "Key out of bound!");
         return m_keys[key] && !m_prevKeys[key];
     }
-
     bool IsKeyHeld(const std::size_t key) const{
         PHY_ASSERT(key < 1024, "Key out of bound!");
         return m_keys[key];
     }
-
     bool IsMouseClicked(const std::size_t key) const {
         return m_buttons[key];
     }
-
     bool MouseMoved() const {return m_mouseMoved;}
     float GetMouseX() const {return m_xPos;}
     float GetMouseY() const {return m_yPos;}
-
     bool ShouldResize() const {return m_shouldResize;}
     bool GetWidth() const {return m_width;}
     bool GetHeight() const {return m_height;}
@@ -101,7 +95,6 @@ public:
     };
 
 
-
     std::function<void(int, int)> windowResized
         = [&](auto width, auto height){
         this->m_shouldResize = true;
@@ -115,8 +108,6 @@ private:
         std::fill(m_prevKeys.begin(), m_prevKeys.end(), false);
         std::fill(m_buttons.begin(), m_buttons.end(), false);
     }
-
-
 
 private:
     std::array<bool, 1024> m_keys;
