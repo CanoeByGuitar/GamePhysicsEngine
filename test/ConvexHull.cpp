@@ -78,7 +78,7 @@ int main(){
 //    world.push_back(actor_ch);
 
     ////// multi layer
-    int num = 1000;
+    int num = 100000;
     std::vector<vec2> points;
     for(int i = 0; i < num; i++){
         points.push_back({
@@ -87,8 +87,13 @@ int main(){
         });
     }
     geo::Particles2D particles(points);
-    auto chs = particles.ComputerMultiLayerConvexHull();
+    TICK(ConvexHull)
+    auto chs = particles.ComputeMultiLayerConvexHull();
+    TOCK(ConvexHull)
 
+//    TICK(ConvexHullO2)
+//    auto chs = particles.ComputeMultiLayerConvexHullOn2();
+//    TOCK(ConvexHullO2)
     int level = 0;
     for(const auto& ch : chs){
         Actor* actor_ch = new ActorBase<geo::Particles3D>("test",

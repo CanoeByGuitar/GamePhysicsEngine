@@ -15,7 +15,8 @@ namespace geo{
         Particles2D(const std::vector<vec2>& pos):m_pos(pos){}
         std::vector<int> ComputeConvexHull();
         Particles3D to3D(float z = 0);
-        std::vector<std::vector<vec3>> ComputerMultiLayerConvexHull();
+        std::vector<std::vector<vec3>> ComputeMultiLayerConvexHull();
+        std::vector<std::vector<vec3>> ComputeMultiLayerConvexHullOn2();
 
         std::vector<vec2> m_pos;
     };

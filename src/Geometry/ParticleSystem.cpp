@@ -100,7 +100,7 @@ geo::Particles3D geo::Particles2D::to3D(float z) {
     return ret;
 }
 
-std::vector<std::vector<vec3>> geo::Particles2D::ComputerMultiLayerConvexHull() {
+std::vector<std::vector<vec3>> geo::Particles2D::ComputeMultiLayerConvexHull() {
     auto tempPos = m_pos;
     std::vector<std::vector<vec3>> ret;
     while(!m_pos.empty()){
@@ -120,5 +120,59 @@ std::vector<std::vector<vec3>> geo::Particles2D::ComputerMultiLayerConvexHull() 
         }
     }
     m_pos = tempPos;
+    return ret;
+}
+
+std::vector<std::vector<vec3>> geo::Particles2D::ComputeMultiLayerConvexHullOn2() {
+    auto points = m_pos;
+    std::sort(points.begin(), points.end(), [&](const vec2& a, const vec2& b){
+        if(a.x == b.x){
+            return a.y < b.y;
+        }else{
+            return a.x < b.x;
+        }
+    });
+    int n = (int)points.size();
+    std::vector<int> isVisit(n);
+    std::fill(isVisit.begin(), isVisit.end(), false);
+
+    int cnt = 0;
+    std::vector<std::vector<vec3>> ret;
+    while(cnt != n){
+        std::vector<int> U, L;
+        for(int i = 0; i < n; i++){
+            if(isVisit[i]) continue;
+            while(L.size() >= 2 && !isClockWise(points[L[L.size() - 1]],
+                                                points[L[L.size() - 2]],
+                                                points[i])){
+                L.pop_back();
+            }
+            L.push_back(i);
+        }
+        for(int i = n - 1; i >= 0; i--){
+            if(isVisit[i]) continue;
+            while(U.size() >= 2 && !isClockWise(points[U[U.size() - 1]],
+                                                points[U[U.size() - 2]],
+                                                points[i])){
+                U.pop_back();
+            }
+            U.push_back(i);
+        }
+        L.pop_back();
+        U.pop_back();
+
+        std::vector<vec3> temp;
+        for(int i : L){
+            isVisit[i] = true;
+            temp.emplace_back(points[i], 0);
+            cnt++;
+        }
+        for(int i : U){
+            isVisit[i] = true;
+            temp.emplace_back(points[i], 0);
+            cnt++;
+        }
+        ret.push_back(temp);
+    }
     return ret;
 }
