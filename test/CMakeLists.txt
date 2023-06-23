@@ -37,3 +37,6 @@ target_link_libraries(JSON Loader)
 
 add_executable(ClothData ClothDatasetTest.cpp)
 target_link_libraries(ClothData Engine)
+
+add_executable(ConvexHull ConvexHull.cpp)
+target_link_libraries(ConvexHull Engine)

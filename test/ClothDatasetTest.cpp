@@ -120,7 +120,7 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(const std::filesystem
         auto type = std::get<std::string>(attr["type"]);
         if(type == "cube"){
             auto geoCube = std::make_shared<geo::AABB>(
-                    std::get<vec3>(attr["pos"]),
+                    std::get<vec3>(attr["m_pos"]),
                     std::get<vec3>(attr["halfSize"])
             );
             actor = new ActorBase<geo::AABB>(

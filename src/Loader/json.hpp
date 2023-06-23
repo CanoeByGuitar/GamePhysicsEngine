@@ -22494,7 +22494,7 @@ m_data.m_value.array->insert(pos.m_it.array_iterator, std::forward<Args>(args)..
 result.m_it.array_iterator = m_data.m_value.array->begin() + insert_pos;
 
 // This could have been written as:
-// result.m_it.array_iterator = m_data.m_value.array->insert(pos.m_it.array_iterator, cnt, val);
+// result.m_it.array_iterator = m_data.m_value.array->insert(m_pos.m_it.array_iterator, cnt, val);
 // but the return value of insert is missing in GCC 4.8, so it is written this way instead.
 
 set_parents();
@@ -22508,7 +22508,7 @@ iterator insert(const_iterator pos, const basic_json& val)
 // insert only works for arrays
 if (JSON_HEDLEY_LIKELY(is_array()))
 {
-// check if iterator pos fits to this JSON value
+// check if iterator m_pos fits to this JSON value
 if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
 {
 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
@@ -22535,7 +22535,7 @@ iterator insert(const_iterator pos, size_type cnt, const basic_json& val)
 // insert only works for arrays
 if (JSON_HEDLEY_LIKELY(is_array()))
 {
-// check if iterator pos fits to this JSON value
+// check if iterator m_pos fits to this JSON value
 if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
 {
 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
@@ -22558,7 +22558,7 @@ if (JSON_HEDLEY_UNLIKELY(!is_array()))
 JSON_THROW(type_error::create(309, detail::concat("cannot use insert() with ", type_name()), this));
 }
 
-// check if iterator pos fits to this JSON value
+// check if iterator m_pos fits to this JSON value
 if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
 {
 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
@@ -22589,7 +22589,7 @@ if (JSON_HEDLEY_UNLIKELY(!is_array()))
 JSON_THROW(type_error::create(309, detail::concat("cannot use insert() with ", type_name()), this));
 }
 
-// check if iterator pos fits to this JSON value
+// check if iterator m_pos fits to this JSON value
 if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
 {
 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));

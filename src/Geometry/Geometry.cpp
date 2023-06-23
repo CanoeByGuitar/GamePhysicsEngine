@@ -74,7 +74,7 @@ namespace geo{
         }
 //        if(BVH_DEPTH > MAX_DEPTH) return;
 
-        PHY_DEBUG("Node bound pos: {}, halfSize: {}, triNum:{}", node->bound.position, node->bound.halfSize, node->triangles.size());
+        PHY_DEBUG("Node bound m_pos: {}, halfSize: {}, triNum:{}", node->bound.position, node->bound.halfSize, node->triangles.size());
 
 
         // Split

@@ -7,12 +7,14 @@
 
 #include <Base/Log.h>
 #include <Geometry/Geometry.h>
+#include <Geometry/ParticleSystem.h>
 #include <Renderer/Objects/ObectBase.h>
 #include "Renderer/Objects/Cube.h"
 #include "Renderer/Objects/Mesh.h"
 #include "Renderer/Objects/Sphere.h"
 #include "Physic/RigidBody.h"
 #include "Physic/Cloth.h"
+#include "Renderer/Objects/Particles.h"
 
 struct RenderComponent{
     std::shared_ptr<renderer::Object> object;
@@ -185,4 +187,43 @@ private:
     std::string m_name = "test";
 };
 
+
+template<>
+class ActorBase<geo::Particles3D> : public Actor{
+public:
+    explicit ActorBase<geo::Particles3D>(const std::shared_ptr<geo::Particles3D>& geo)
+            :m_geometry(geo){
+        m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
+    }
+
+    ActorBase<geo::Particles3D>(const std::string& name, const std::shared_ptr<geo::Particles3D>& geo)
+            :m_geometry(geo), m_name(name){
+        m_renderComponent = std::make_shared<RenderComponent>();
+        m_geoPtrCopy = m_geometry.get();
+    }
+
+
+    void InitRenderObject() override {
+        m_renderComponent->object = std::make_shared<renderer::Particles>(
+                m_name.c_str(),
+                m_geometry,
+                m_renderComponent->drawMode,
+                m_renderComponent->primitiveType,
+                m_renderComponent->color
+        );
+    }
+
+    void UpdateRenderObject() override {
+
+    }
+
+    void InitPhysicsObject() override{
+
+    }
+
+private:
+    std::shared_ptr<geo::Particles3D> m_geometry;
+    std::string m_name = "test";
+};
 #endif //GAMEPHYSICSINONEWEEKEND_ACTOR_H
