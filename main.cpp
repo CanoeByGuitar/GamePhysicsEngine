@@ -1,15 +1,25 @@
 #include <Eigen/Dense>
 #include <iostream>
+#include <vector>
+#include <Base/Log.h>
+#include <random>
 
 int main() {
-    // 创建3x3的浮点型矩阵
-    Eigen::Matrix3f matrix;
-    matrix << 1, 2, 3,
-            4, 5, 6,
-            7, 8, 9;
+    Eigen::VectorXf v = Eigen::Vector3f::Constant(1000, 1.f);
+    TICK(eigen)
+    for(int k = 0; k < 100000; k++){
+        v  += Eigen::Vector3f::Constant(1000, 1.f);
+    }
+    TOCK(eigen)
 
-    // 输出矩阵
-    std::cout << "Matrix:\n" << matrix << std::endl;
+    std::vector a(1000, 1.0f);
+    TICK(stdvector)
+    for(int k = 0; k < 100000; k++){
+        for(auto& i : a){
+            i += 1.0f;
+        }
+    }
+    TOCK(stdvector)
 
     return 0;
 }

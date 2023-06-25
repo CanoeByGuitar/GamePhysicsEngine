@@ -9,6 +9,7 @@
 #include "MovableObject.h"
 
 
+enum ClothScheme{ImplicitSolver, PBD};
 
 
 class Cloth : public MovableObject{
@@ -35,6 +36,8 @@ public:
     void HandleCollision();
 
 private:
+    ClothScheme m_clothScheme = ClothScheme::PBD;
+
     std::shared_ptr<geo::Model> m_model;
 
 
@@ -47,7 +50,7 @@ private:
 
     float m_mass = 1;
     float m_dt = 1.2e-3; // substep
-    int m_iter = 1; // newton max iters
+    int m_iter = 16; // newton max iters
     float m_epsilon = 1e-2; // newton delta x threshould
     float m_springK = 200; // spring force
 
