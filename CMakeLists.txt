@@ -3,6 +3,10 @@ project(GamePhysicsInOneWeekend)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIRS})
+
 include_directories(${PROJECT_SOURCE_DIR}/external/)
 include_directories(${PROJECT_SOURCE_DIR}/external/spdlog/include)
 include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
@@ -35,7 +39,7 @@ add_subdirectory(test)
 
 
 add_executable(main main.cpp)
-target_link_libraries(main Imgui)
+target_link_libraries(main Base)
 
 if(LINUX)
 add_definitions(-DfPIC)
