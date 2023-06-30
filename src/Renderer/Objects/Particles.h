@@ -14,15 +14,14 @@ namespace renderer {
         vec3 position;
     };
 
-    class Particles : public ObjectBase<PlainParticleVertex> {
+    class Particles : public Object {
 
     public:
         Particles(const std::string &name,
                   const std::shared_ptr<geo::Particles3D> &mParticles,
                   DrawMode mode = DrawMode::STATIC,
-                  PrimitiveType type = TRIANGLE,
-                  const vec3 &color = vec3(1, 0, 0))
-                  : ObjectBase(name, mode, type, color),
+                  PrimitiveType type = TRIANGLE)
+                  : Object(name, mode, type),
                   m_particles(mParticles) {}
 
 
@@ -71,6 +70,7 @@ namespace renderer {
 
     private:
         std::shared_ptr<geo::Particles3D> m_particles;
+        std::vector<PlainParticleVertex> m_vertices;
     };
 }
 

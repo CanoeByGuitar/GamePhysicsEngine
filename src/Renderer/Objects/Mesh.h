@@ -10,129 +10,65 @@
 #include "ObectBase.h"
 
 namespace renderer {
-    struct BasicMeshVertex {
-        vec3 position;
+struct MeshVertex {
+    vec3 Position;
+    vec3 Normal;
+    vec2 Coord;
+    explicit MeshVertex(const vec3& position) : Position(position) {}
+    MeshVertex(const vec3& position, const vec3& normal, const vec2& coord)
+        : Position(position), Normal(normal), Coord(coord) {}
+};
+
+class Mesh : public Object {
+   public:
+    Mesh(const char* name, const std::shared_ptr<geo::Mesh>& GeoMesh,
+         DrawMode mode = DrawMode::DYNAMIC,
+         PrimitiveType type = PrimitiveType::TRIANGLE)
+        : Object(name, mode, type), m_geoMesh(GeoMesh) {}
+
+    void SetPipelineData() override {
+        m_VAO.Init();
+        m_VAO.Bind();
+
+        // vertices
+        m_VAO.AttachBuffer(BufferType::ARRAY,
+                           m_vertices.size() * sizeof(MeshVertex),
+                           m_vertices.data(), m_drawMode);
+        // indices
+        m_VAO.AttachBuffer(BufferType::ELEMENT,
+                           m_indices.size() * sizeof(unsigned int),
+                           m_indices.data(), m_drawMode);
+
+        m_VAO.EnableAttribute(0, 3, sizeof(MeshVertex), (void*)0);
+        m_VAO.EnableAttribute(1, 3, sizeof(MeshVertex), (void*)3);
+        m_VAO.EnableAttribute(2, 2, sizeof(MeshVertex), (void*)6);
     };
 
-    class BasicMesh : public ObjectBase<BasicMeshVertex> {
-    public:
-        BasicMesh(const char *name,
-                  const std::shared_ptr<geo::Mesh> &GeoMesh,
-                  DrawMode mode = DrawMode::DYNAMIC,
-                  PrimitiveType type = PrimitiveType::TRIANGLE,
-                  vec3 color = vec3(-1))
-                : ObjectBase(name, mode, type, color), m_GeoMesh(GeoMesh) {
+    void SetupVerticesBuffer() override {
+        auto triangleNum = m_geoMesh->triangles.size();
+        m_vertices.clear();
+        m_indices.clear();
+        m_vertices.reserve(triangleNum * 3);
+        m_indices.reserve(triangleNum * 3);
 
-        }
-
-        void SetPipelineData() override {
-            m_VAO.Init();
-            m_VAO.Bind();
-
-            // vertices
-            m_VAO.AttachBuffer(BufferType::ARRAY,
-                               m_vertices.size() * sizeof(BasicMeshVertex),
-                               m_vertices.data(),
-                               m_drawMode);
-            // indices
-            m_VAO.AttachBuffer(BufferType::ELEMENT,
-                               m_indices.size() * sizeof(unsigned int),
-                               m_indices.data(),
-                               m_drawMode);
-
-            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void *) 0);
-        };
-
-        void SetupVerticesBuffer() override {
-            auto triangleNum = m_GeoMesh->triangles.size();
-            m_vertices.clear();
-            m_indices.clear();
-            m_vertices.reserve(triangleNum * 3);
-            m_indices.reserve(triangleNum * 3);
-
-            unsigned int idx = 0;
-            for (auto tri: m_GeoMesh->triangles) {
-                for (int i = 0; i < 3; i++) {
-                    m_vertices.push_back({tri->points[i]});
-                    m_indices.push_back(idx++);
-                }
+        unsigned int idx = 0;
+        for (auto tri : m_geoMesh->triangles) {
+            for (int i = 0; i < 3; i++) {
+                m_vertices.push_back(MeshVertex{tri->points[i]});
+                m_indices.push_back(idx++);
             }
-        };
-
-        void SetMaterial() override {
-            PHY_ASSERT(1, "No BasicMesh Material For now!");
-        };
-
-
-    private:
-        std::shared_ptr<geo::Mesh> m_GeoMesh;
-    };
-
-    class BasicModel : public ObjectBase<BasicMeshVertex> {
-    public:
-        BasicModel(const char *name,
-                   const std::shared_ptr<geo::Model> &model,
-                   DrawMode mode = DrawMode::DYNAMIC,
-                   PrimitiveType type = PrimitiveType::TRIANGLE,
-                   vec3 color = vec3(-1))
-                : ObjectBase(name, mode, type, color), m_GeoModel(model) {
-
         }
-
-        void SetPipelineData() override {
-            m_VAO.Init();
-            m_VAO.Bind();
-
-            // vertices
-            m_VAO.AttachBuffer(BufferType::ARRAY,
-                               m_vertices.size() * sizeof(BasicMeshVertex),
-                               m_vertices.data(),
-                               m_drawMode);
-            // indices
-            m_VAO.AttachBuffer(BufferType::ELEMENT,
-                               m_indices.size() * sizeof(unsigned int),
-                               m_indices.data(),
-                               m_drawMode);
-
-            m_VAO.EnableAttribute(0, 3, sizeof(BasicMeshVertex), (void *) 0);
-        };
-
-        void SetupVerticesBuffer() override {
-            m_vertices.clear();
-            m_indices.clear();
-            unsigned int idx = 0;
-            for (const auto &mesh: m_GeoModel->m_meshes) {
-                m_indices.reserve(m_indices.size() + mesh.indices.size());
-                auto tempSize = m_vertices.size();
-                for (int i = 0; i < mesh.indices.size(); i++) {
-                    m_indices.push_back(mesh.indices[i] + tempSize);
-                }
-                m_vertices.reserve(m_vertices.size() + mesh.vertices.size());
-                for (int i = 0; i < mesh.vertices.size(); i++) {
-                    m_vertices.push_back({mesh.vertices[i]});
-                }
-
-//                auto triangleNum = mesh.triangles.size();
-//                m_vertices.reserve(m_vertices.size() + triangleNum * 3);
-//                m_indices.reserve(m_indices.size() + triangleNum * 3);
-//                for(auto tri : mesh.triangles){
-//                    for(int i = 0; i < 3; i++){
-//                        m_vertices.push_back({tri->points[i]});
-//                        m_indices.push_back(idx++);
-//                    }
-//                }
-            }
-
-        };
-
-        void SetMaterial() override {
-            PHY_ASSERT(1, "No BasicMesh Material For now!");
-        };
-
-
-    private:
-        std::shared_ptr<geo::Model> m_GeoModel;
     };
-}
 
-#endif //GAMEPHYSICSINONEWEEKEND_MESH_H
+    void SetMaterial() override{
+
+    };
+
+   private:
+    std::shared_ptr<geo::Mesh> m_geoMesh;
+    std::vector<MeshVertex> m_vertices;
+};
+
+}  // namespace renderer
+
+#endif  //GAMEPHYSICSINONEWEEKEND_MESH_H

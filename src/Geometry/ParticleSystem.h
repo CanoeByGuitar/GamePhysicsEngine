@@ -21,9 +21,9 @@ namespace geo{
         std::vector<vec2> m_pos;
     };
 
-
 }
 
+using GeoParticlesPtr = std::shared_ptr<geo::Particles3D>;
 
 
 

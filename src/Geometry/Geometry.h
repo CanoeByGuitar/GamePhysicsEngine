@@ -15,9 +15,6 @@ namespace geo{
         MID_TRIANGLE_PARTITION
     };
 
-    struct GeometryBase{
-
-    };
 
     struct Line{
         vec3 start;
@@ -45,7 +42,6 @@ namespace geo{
         vec3 halfSize;
         AABB() = default;
         AABB(const vec3& p, const vec3& s): position(p), halfSize(s){}
-
     };
 
     struct OBB{
@@ -114,12 +110,14 @@ namespace geo{
 
         Mesh():accelerator(nullptr){}
     };
+    using GeoMeshPtr = std::shared_ptr<Mesh>;
 
     struct Model{
         std::vector<Mesh> m_meshes;
 
         Model() = default;
     };
+
 
 
 
@@ -166,7 +164,9 @@ namespace geo{
 }
 
 
-
+using GeoAabbPtr = std::shared_ptr<geo::AABB>;
+using GeoModelPtr = std::shared_ptr<geo::Model>;
+using GeoSpherePtr = std::shared_ptr<geo::Sphere>;
 
 
 

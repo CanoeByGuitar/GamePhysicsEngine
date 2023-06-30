@@ -9,221 +9,75 @@
 #include <Geometry/Geometry.h>
 #include <Geometry/ParticleSystem.h>
 #include <Renderer/Objects/ObectBase.h>
+
+#include <utility>
+#include "Physic/Cloth.h"
+#include "Physic/RigidBody.h"
 #include "Renderer/Objects/Cube.h"
 #include "Renderer/Objects/Mesh.h"
-#include "Renderer/Objects/Sphere.h"
-#include "Physic/RigidBody.h"
-#include "Physic/Cloth.h"
 #include "Renderer/Objects/Particles.h"
+#include "Renderer/Objects/Sphere.h"
 
-struct RenderComponent{
-    std::shared_ptr<renderer::Object> object;
+struct RenderComponent {
+    std::vector<RenderObjPtr> objects;
     renderer::DrawMode drawMode;
     renderer::PrimitiveType primitiveType;
-    vec3 color = vec3{-1};
 
-    void SetDrawMode(renderer::DrawMode mode){
-        object->SetDrawMode(mode);
-    }
-
-    void SetPrimitiveType(renderer::PrimitiveType type){
-        object->SetPrimitiveType(type);
-    }
-
-    void SetColor(const vec3 &c){
-        object->SetColor(c);
-    }
 };
 
-struct PhysicsComponent{
+struct PhysicsComponent {
     std::shared_ptr<MovableObject> object;
-
 };
 
-
-class Actor{
-public:
+class Actor {
+   public:
+    Actor(std::string name):m_name(std::move(name)){};
     virtual void InitRenderObject() = 0;
-    virtual void UpdateRenderObject() = 0;
     virtual void InitPhysicsObject() = 0;
 
-public:
+   public:
     std::shared_ptr<RenderComponent> m_renderComponent;
     std::shared_ptr<PhysicsComponent> m_physicsComponent;
-    void* m_geoPtrCopy;
+    std::string m_name;
+    void* m_geometryCopy = nullptr;
+    
 };
 
-template<typename T>
-class ActorBase : public Actor{
-public:
-    void InitRenderObject() override {}
-    void UpdateRenderObject() override {}
-    virtual void InitPhysicsObject() override {};
-public:
-    std::shared_ptr<T> m_geometry;
+class AabbActor : public Actor {
+   public:
+    AabbActor(GeoAabbPtr cube, std::string name);
+    void InitRenderObject() override;
+    void InitPhysicsObject() override;
+
+   private:
+    GeoAabbPtr m_geometry;
 };
 
-
-
-template<>
-class ActorBase<geo::AABB> : public Actor{
-public:
-    ActorBase<geo::AABB>() = default;
-    explicit ActorBase<geo::AABB>(const std::shared_ptr<geo::AABB>& cube)
-            :m_geometry(cube){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-    ActorBase<geo::AABB>(const std::string& name, const std::shared_ptr<geo::AABB>& cube)
-            :m_name(name), m_geometry(cube){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-
-    void InitRenderObject() override {
-        m_renderComponent->object = std::make_shared<renderer::Cube>(
-                m_name.c_str(),
-                m_geometry,
-                m_renderComponent->drawMode,
-                m_renderComponent->primitiveType,
-                m_renderComponent->color
-                );
-    }
-
-    void InitPhysicsObject() override{
-        m_physicsComponent = std::make_shared<PhysicsComponent>();
-        m_physicsComponent->object = std::make_shared<RigidBodyBox>(
-                    m_geometry);
-
-    }
-
-    void UpdateRenderObject() override {
-
-    }
-
-private:
-    std::shared_ptr<geo::AABB> m_geometry;
-    std::string m_name = "test";
+class ModelActor : public Actor{
+   public:
+    ModelActor(GeoModelPtr model, std::string name);
+    void InitRenderObject() override;
+    void InitPhysicsObject() override;
+   private:
+    GeoModelPtr m_geometry;
 };
 
-template<>
-class ActorBase<geo::Model> : public Actor{
-public:
-    explicit ActorBase<geo::Model>(const std::shared_ptr<geo::Model>& model)
-            :m_geometry(model){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-    ActorBase<geo::Model>(const std::string& name, const std::shared_ptr<geo::Model>& model)
-            :m_geometry(model), m_name(name){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-
-    void InitRenderObject() override {
-        m_renderComponent->object = std::make_shared<renderer::BasicModel>(
-                m_name.c_str(),
-                m_geometry,
-                m_renderComponent->drawMode,
-                m_renderComponent->primitiveType,
-                m_renderComponent->color
-        );
-    }
-
-    void UpdateRenderObject() override {}
-
-    void InitPhysicsObject() override{
-        m_physicsComponent = std::make_shared<PhysicsComponent>();
-        m_physicsComponent->object = std::make_shared<Cloth>(
-                m_geometry);
-    }
-
-private:
-    std::shared_ptr<geo::Model> m_geometry;
-    std::string m_name = "test";
+class SphereActor : public Actor{
+   public:
+    SphereActor(GeoSpherePtr sphere, std::string name);
+    void InitRenderObject() override;
+    void InitPhysicsObject() override;
+   private:
+    GeoSpherePtr m_geometry;
 };
 
-
-template<>
-class ActorBase<geo::Sphere> : public Actor{
-public:
-    explicit ActorBase<geo::Sphere>(const std::shared_ptr<geo::Sphere>& sphere)
-            :m_geometry(sphere){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-    ActorBase<geo::Sphere>(const std::string& name, const std::shared_ptr<geo::Sphere>& sphere)
-            :m_geometry(sphere), m_name(name){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-
-    void InitRenderObject() override {
-        m_renderComponent->object = std::make_shared<renderer::Sphere>(
-                m_name.c_str(),
-                m_geometry,
-                m_renderComponent->drawMode,
-                m_renderComponent->primitiveType,
-                m_renderComponent->color
-        );
-    }
-
-    void UpdateRenderObject() override {}
-
-    void InitPhysicsObject() override{
-        m_physicsComponent = std::make_shared<PhysicsComponent>();
-        m_physicsComponent->object = std::make_shared<RigidBodySphere>(
-                m_geometry);
-    }
-
-private:
-    std::shared_ptr<geo::Sphere> m_geometry;
-    std::string m_name = "test";
+class ParticlesActor : public Actor{
+   public:
+    ParticlesActor(GeoParticlesPtr particle, std::string name);
+    void InitRenderObject() override;
+    void InitPhysicsObject() override;
+   private:
+    GeoParticlesPtr m_geometry;
 };
 
-
-template<>
-class ActorBase<geo::Particles3D> : public Actor{
-public:
-    explicit ActorBase<geo::Particles3D>(const std::shared_ptr<geo::Particles3D>& geo)
-            :m_geometry(geo){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-    ActorBase<geo::Particles3D>(const std::string& name, const std::shared_ptr<geo::Particles3D>& geo)
-            :m_geometry(geo), m_name(name){
-        m_renderComponent = std::make_shared<RenderComponent>();
-        m_geoPtrCopy = m_geometry.get();
-    }
-
-
-    void InitRenderObject() override {
-        m_renderComponent->object = std::make_shared<renderer::Particles>(
-                m_name.c_str(),
-                m_geometry,
-                m_renderComponent->drawMode,
-                m_renderComponent->primitiveType,
-                m_renderComponent->color
-        );
-    }
-
-    void UpdateRenderObject() override {
-
-    }
-
-    void InitPhysicsObject() override{
-
-    }
-
-private:
-    std::shared_ptr<geo::Particles3D> m_geometry;
-    std::string m_name = "test";
-};
-#endif //GAMEPHYSICSINONEWEEKEND_ACTOR_H
+#endif  //GAMEPHYSICSINONEWEEKEND_ACTOR_H
