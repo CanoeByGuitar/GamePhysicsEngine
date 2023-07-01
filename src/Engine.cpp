@@ -70,7 +70,8 @@ void Engine::Init() {
     PHY_INFO("Initializing renderer...");
     m_scene = std::make_shared<Scene>();
     for(auto& actor : m_world){
-        m_scene->AddObject(actor->m_renderComponent->object);
+        for(const auto& obj : actor->m_renderComponent->objects)
+        m_scene->AddObject(obj);
     }
     m_renderer.Init();
 

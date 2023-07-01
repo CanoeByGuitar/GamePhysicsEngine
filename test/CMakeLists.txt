@@ -26,14 +26,15 @@ target_link_libraries(LogTest Base)
 #add_executable(RendererTest RendererTest.cpp)
 #target_link_libraries(RendererTest Engine)
 
-add_executable(Actor ActorRenderTest.cpp)
-target_link_libraries(Actor Engine)
+add_executable(ActorRenderTest ActorRenderTest.cpp)
+target_link_libraries(ActorRenderTest Engine)
 
-add_executable(BVH BVHTest.cpp)
-target_link_libraries(BVH Engine)
-
-add_executable(JSON JSONTest.cpp)
-target_link_libraries(JSON Loader)
+#
+#add_executable(BVH BVHTest.cpp)
+#target_link_libraries(BVH Engine)
+#
+#add_executable(JSON JSONTest.cpp)
+#target_link_libraries(JSON Loader)
 
 add_executable(ClothData ClothDatasetTest.cpp)
 target_link_libraries(ClothData Engine)

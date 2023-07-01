@@ -110,7 +110,7 @@ namespace geo{
 
         Mesh():accelerator(nullptr){}
     };
-    using GeoMeshPtr = std::shared_ptr<Mesh>;
+
 
     struct Model{
         std::vector<Mesh> m_meshes;
@@ -167,7 +167,7 @@ namespace geo{
 using GeoAabbPtr = std::shared_ptr<geo::AABB>;
 using GeoModelPtr = std::shared_ptr<geo::Model>;
 using GeoSpherePtr = std::shared_ptr<geo::Sphere>;
-
+using GeoMeshPtr = std::shared_ptr<geo::Mesh>;
 
 
 

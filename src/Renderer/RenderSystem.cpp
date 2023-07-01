@@ -148,16 +148,17 @@ namespace renderer{
         auto begin = renderListBegin;
         while(begin != renderListEnd){
             auto objectPtr = *begin;
-            if(objectPtr->isVisible){
-                static auto& shader = m_shaderCache.at(objectPtr->GetObjName());
+            if(objectPtr->m_isVisible){
+                static auto& shader = m_shaderCache.at(objectPtr->m_name);
                 shader.Bind();
                 shader.SetUniform("model", glm::mat4(1.0f));
-                if(glm::all(glm::greaterThanEqual(objectPtr->GetColor(), vec3{0}))){
-                    shader.SetUniform("color", objectPtr->GetColor());
-                }else{
-                    shader.SetUniform("color", vec3(227,75,33) / 255.f);
-                }
-                if(objectPtr->GetDrawMode() != DrawMode::STATIC){
+//                if(glm::all(glm::greaterThanEqual(objectPtr->GetColor(), vec3{0}))){
+//                    shader.SetUniform("color", objectPtr->GetColor());
+//                }else{
+//                    shader.SetUniform("color", vec3(227,75,33) / 255.f);
+//                }
+                shader.SetUniform("color", vec3(227,75,33) / 255.f);
+                if(objectPtr->m_drawMode != DrawMode::STATIC){
                     objectPtr->SetupVerticesBuffer();
                     objectPtr->SetPipelineData();
                 }

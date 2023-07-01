@@ -27,9 +27,9 @@ ModelActor::ModelActor(GeoModelPtr model, std::string name)
 }
 
 void ModelActor::InitRenderObject() {
-    for (const auto& mesh : m_geometry->m_meshes) {
+    for (auto& mesh : m_geometry->m_meshes) {
         m_renderComponent->objects.push_back(std::make_shared<renderer::Mesh>(
-            m_name.c_str(), std::make_shared<geo::Mesh>(mesh),
+            m_name.c_str(), std::shared_ptr<geo::Mesh>(&mesh),
             m_renderComponent->drawMode, m_renderComponent->primitiveType));
     }
 }
@@ -60,8 +60,8 @@ void SphereActor::InitPhysicsObject() {
         std::make_shared<RigidBodySphere>(m_geometry);
 }
 
-ParticlesActor::ParticlesActor(GeoParticlesPtr particle, std::string name)
-    : m_geometry(std::move(particle)), Actor(std::move(name)) {
+ParticlesActor::ParticlesActor(const GeoParticlesPtr& particle, std::string name)
+    : m_geometry(particle), Actor(std::move(name)) {
     m_renderComponent = std::make_shared<RenderComponent>();
     m_geometryCopy = m_geometry.get();
 }

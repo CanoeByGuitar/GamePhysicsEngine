@@ -17,7 +17,9 @@ namespace renderer {
         explicit Object(std::string name,
                         DrawMode mode = DrawMode::DYNAMIC,
                         PrimitiveType type = PrimitiveType::TRIANGLE)
-            : m_name(std::move(name)), m_drawMode(mode), m_primitiveType(type) {}
+            : m_name(std::move(name)), m_drawMode(mode), m_primitiveType(type) {
+            m_VAO = GLVertexArray();
+        }
         virtual ~Object() = default;
         virtual void SetPipelineData() = 0;
         virtual void SetupVerticesBuffer() = 0;
@@ -39,7 +41,7 @@ namespace renderer {
         DrawMode m_drawMode;
         PrimitiveType m_primitiveType;
         std::vector<unsigned int> m_indices;
-        GLVertexArray m_VAO;
+        GLVertexArray m_VAO{};
     };
 
 }// namespace renderer

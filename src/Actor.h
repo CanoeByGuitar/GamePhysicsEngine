@@ -73,7 +73,7 @@ class SphereActor : public Actor{
 
 class ParticlesActor : public Actor{
    public:
-    ParticlesActor(GeoParticlesPtr particle, std::string name);
+    ParticlesActor(const GeoParticlesPtr& particle, std::string name);
     void InitRenderObject() override;
     void InitPhysicsObject() override;
    private:

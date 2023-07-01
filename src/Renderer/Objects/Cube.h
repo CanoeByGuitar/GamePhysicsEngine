@@ -21,8 +21,7 @@ namespace renderer {
         Cube(const char *name,
              const std::shared_ptr<AABB> &bound,
              DrawMode mode = DrawMode::DYNAMIC,
-             PrimitiveType type = PrimitiveType::TRIANGLE,
-             vec3 color = vec3(-1))
+             PrimitiveType type = PrimitiveType::TRIANGLE)
             : Object(name, mode, type), m_bound(bound) {}
 
         void SetPipelineData() override {

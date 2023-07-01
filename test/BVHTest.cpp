@@ -22,7 +22,7 @@ using namespace renderer;
 
 
 std::shared_ptr<geo::AABB> ground_geo;
-ActorBase<geo::AABB>* actor_ground;
+AabbActor* actor_ground;
 
 std::unordered_map<std::shared_ptr<Object> , int> BVHLevelMap;
 std::unordered_map<geo::BVHNode*, std::shared_ptr<Object>> NodeMap;

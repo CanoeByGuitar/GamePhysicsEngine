@@ -38,7 +38,7 @@ public:
 private:
     ClothScheme m_clothScheme = ClothScheme::PBD;
 
-    std::shared_ptr<geo::Model> m_model;
+    GeoModelPtr m_model;
 
 
     std::vector<vec3> m_vertices; // x

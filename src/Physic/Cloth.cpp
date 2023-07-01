@@ -14,16 +14,21 @@ namespace control {
 
 static std::vector<vec3> last_x;
 static std::vector<vec3> init_x;
+static std::vector<int> modelVertsNumVec;
 
 void Cloth::SetupEdgeList() {
     for (const auto &mesh: m_model->m_meshes) {
+        modelVertsNumVec.push_back((int)mesh.vertices.size());
         m_indices.reserve(m_indices.size() + mesh.indices.size());
         auto tempSize = m_vertices.size();
+
         for (int i = 0; i < mesh.indices.size(); i++) {
             m_indices.push_back(mesh.indices[i] + tempSize);
         }
         m_vertices.reserve(m_vertices.size() + mesh.vertices.size());
         m_vertices.insert(m_vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
+
+//        PHY_INFO("now size: {}", m_vertices.size());
     }
     m_velocities = std::vector<vec3>(m_vertices.size(), vec3(0));
     PHY_INFO("Models have {} meshes, there are totally {} vertices and {} indices.",
@@ -90,7 +95,16 @@ void Cloth::Init() {
 }
 
 void Cloth::Finish() {
-    m_model->m_meshes[0].vertices = m_vertices;
+    int len = 0;
+    for(int i = 0; i < m_model->m_meshes.size(); i++){
+        m_model->m_meshes[i].vertices =
+            std::vector<vec3>(m_vertices.begin() + len,
+                              m_vertices.begin() + len + modelVertsNumVec[i]);
+        len += modelVertsNumVec[i];
+//        PHY_INFO("len: {}", len);
+    }
+//    m_model->m_meshes[0].vertices = m_vertices;
+
 //    auto& triVec = m_model->m_meshes[0].triangles;
 //    triVec.clear();
 //    triVec.reserve(m_indices.size() / 3);

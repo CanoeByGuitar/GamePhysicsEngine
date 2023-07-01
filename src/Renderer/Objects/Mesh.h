@@ -7,6 +7,8 @@
 
 #include <Geometry/Geometry.h>
 #include <Renderer/GLVertexArray.h>
+
+#include <utility>
 #include "ObectBase.h"
 
 namespace renderer {
@@ -21,10 +23,10 @@ struct MeshVertex {
 
 class Mesh : public Object {
    public:
-    Mesh(const char* name, const std::shared_ptr<geo::Mesh>& GeoMesh,
+    Mesh(const char* name, GeoMeshPtr  GeoMesh,
          DrawMode mode = DrawMode::DYNAMIC,
          PrimitiveType type = PrimitiveType::TRIANGLE)
-        : Object(name, mode, type), m_geoMesh(GeoMesh) {}
+        : Object(name, mode, type), m_geoMesh(std::move(GeoMesh)) {}
 
     void SetPipelineData() override {
         m_VAO.Init();
@@ -45,19 +47,16 @@ class Mesh : public Object {
     };
 
     void SetupVerticesBuffer() override {
-        auto triangleNum = m_geoMesh->triangles.size();
         m_vertices.clear();
+        m_vertices.reserve(m_geoMesh->vertices.size());
         m_indices.clear();
-        m_vertices.reserve(triangleNum * 3);
-        m_indices.reserve(triangleNum * 3);
-
-        unsigned int idx = 0;
-        for (auto tri : m_geoMesh->triangles) {
-            for (int i = 0; i < 3; i++) {
-                m_vertices.push_back(MeshVertex{tri->points[i]});
-                m_indices.push_back(idx++);
-            }
+        m_indices.reserve(m_geoMesh->indices.size());
+        for(auto & vertex : m_geoMesh->vertices){
+            m_vertices.emplace_back(
+                    vertex
+                );
         }
+        m_indices = m_geoMesh->indices;
     };
 
     void SetMaterial() override{

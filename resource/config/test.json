@@ -1,0 +1,15 @@
+{
+  "objects": [
+    {
+      "name" : "ground",
+      "type" : "cube",
+      "pos" : [0, 0, 0],
+      "halfSize" : [1, 1, 1],
+      "shader_name" : "test",
+      "color" : [1, 0, 0],
+      "drawMode": "static",
+      "primitiveType": "triangle",
+      "model_path": ""
+    }
+  ]
+}
