@@ -58,36 +58,26 @@ geo::Model& ResourceManager::LoadModelFileNoMaterial(
 
             // deduplicate
             if (deduplicated) {
-                std::unordered_map<glm::vec3, int, Vec3Hash> duplicate;
-                int duplicateNum = 0;
-                std::vector<vec3> newVertices;
-                newVertices.reserve(m_vertices.size());
-                std::vector<unsigned int> newIndices(m_indices.size());
-                for (int i = 0; i < m_vertices.size(); i++) {
-                    if (duplicate.find(m_vertices[i]) == duplicate.end()) {
-                        newVertices.push_back(m_vertices[i]);
-                        newIndices[i] = m_indices[i] - duplicateNum;
-                        duplicate[m_vertices[i]] = newIndices[i];
+                std::unordered_map<vec3, int, Vec3Hash> vertexMap;
+                std::vector<vec3> uniqueVertices;
+                uniqueVertices.reserve(m_vertices.size());
+
+                for (int i = 0; i < m_indices.size(); i++) {
+                    auto vertIdx = m_indices[i];
+                    auto it = vertexMap.find(m_vertices[vertIdx]);
+                    if (it == vertexMap.end()) {
+                        int newIndex = static_cast<int>(uniqueVertices.size());
+                        vertexMap[m_vertices[vertIdx]] = newIndex;
+                        uniqueVertices.push_back(m_vertices[vertIdx]);
+                        m_indices[i] = newIndex;
                     } else {
-                        newIndices[i] = duplicate[m_vertices[i]];
-                        duplicateNum++;
+                        m_indices[i] = vertexMap[m_vertices[vertIdx]];
                     }
                 }
-                PHY_INFO("duplicateNum: {}", duplicateNum);
-                newVertices.shrink_to_fit();
-                m_vertices.swap(newVertices);
-                m_indices.swap(newIndices);
-                PHY_INFO(
-                    "After deduplicate, there are totally {} vertices and {} "
-                    "indices.",
-                    m_vertices.size(), m_indices.size());
-                //    for(int i = 0; i < m_vertices.size(); i++){
-                //        PHY_INFO("({}): {}  ",i, m_vertices[i]);
-                //    }
-
-                //                for(int i = 0; i < m_indices.size(); i++){
-                //                    PHY_INFO("({}): {}  ",i, m_indices[i]);
-                //                }
+                uniqueVertices.shrink_to_fit();
+                m_vertices = std::move(uniqueVertices);
+                PHY_INFO("after deduplicate: {} vertices, {} indices",
+                         m_vertices.size(), m_indices.size());
             }
 
             geoMesh.vertices = m_vertices;

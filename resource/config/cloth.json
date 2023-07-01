@@ -7,7 +7,8 @@
       "color" : [0, 0.8, 0.6],
       "drawMode": "dynamic",
       "primitiveType": "line",
-      "model_path": "resource/models/dress.obj"
+      "model_path": "resource/models/dress.obj",
+      "temp": "resource/models/cloth20x20(small).obj"
     },
     {
       "name" : "ball",

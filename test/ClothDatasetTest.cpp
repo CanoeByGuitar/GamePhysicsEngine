@@ -29,8 +29,10 @@ namespace control {
 extern vec4 clear_color;
 extern geo::BVHSplitStrategy bvh_strategy;
 extern bool start;
+extern bool restart;
 extern vec3 center;
 extern float radius;
+extern geo::AABB scene_bound;
 }  // namespace control
 
 std::shared_ptr<geo::Sphere> ball_geo;
@@ -64,6 +66,10 @@ class MyGui : public GuiSystem {
 
         if (ImGui::Button("start/stop")) {
             control::start = !control::start;
+        }
+
+        if (ImGui::Button("restart")) {
+            control::restart = true;
         }
 
         if (ImGui::Button("move ball")) {
@@ -123,7 +129,7 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
         } else if (type == "model") {
             auto geoModel = std::make_shared<geo::Model>(
                 ResourceManager::GetInstance().LoadModelFileNoMaterial(
-                    std::get<std::string>(attr["model_path"]), false));
+                    std::get<std::string>(attr["model_path"]), true));
             actor = new ModelActor(geoModel,
                                    std::get<std::string>(attr["shader_name"]));
         } else if (type == "sphere") {
@@ -172,5 +178,10 @@ int main() {
     auto gui = new MyGui;
     Engine engine(world, gui);
     engine.Init();
+
+    auto pos = control::scene_bound.position;
+    PHY_INFO("camera pos: {}", pos);
+    engine.SetCameraPosition({pos.x, pos.y, 10});
+
     engine.Execute();
 }

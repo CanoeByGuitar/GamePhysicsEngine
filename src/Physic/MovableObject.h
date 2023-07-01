@@ -16,6 +16,7 @@ public:
     virtual void Init() = 0;
     virtual void Finish() = 0;
     virtual void Update(float dt) = 0;
+    virtual void Restart(){};
 protected:
     vec3 vel = vec3(0.f, -0.5f, 0.f);
 };

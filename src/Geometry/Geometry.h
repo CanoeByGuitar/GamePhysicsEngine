@@ -161,6 +161,24 @@ namespace geo{
         }
         return ret;
     }
+
+    inline AABB GetBound(const Mesh& mesh){
+        vec3 min = mesh.vertices[0];
+        vec3 max = mesh.vertices[0];
+        for(int i = 1; i < mesh.vertices.size(); i++){
+            min = glm::min(min, mesh.vertices[i]);
+            max = glm::max(max, mesh.vertices[i]);
+        }
+        return {0.5f * (min + max), 0.5f * (max - min)};
+    }
+
+    inline AABB GetBound(const Model& model){
+        auto ret = GetBound(model.m_meshes[0]);
+        for(int i = 1; i < model.m_meshes.size(); i++){
+            ret = UnionBounds(ret, GetBound(model.m_meshes[i]));
+        }
+        return ret;
+    }
 }
 
 

@@ -23,7 +23,9 @@ public:
     explicit Engine(const std::vector<Actor*> &world, GuiSystem* gui = new GuiSystem);
     void Init();
     void Execute();
-
+    void SetCameraPosition(const vec3& pos){
+        m_camera.SetPos(pos);
+    }
 
 
 private:

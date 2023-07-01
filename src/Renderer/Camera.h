@@ -16,6 +16,9 @@ public:
     void Update(const double deltaTime);
     void SetNear(const float near);
     void SetFar(const float far);
+    void SetPos(const vec3& pos){
+        m_position = pos;
+    }
     void SetSpeed(const float speed);
     auto GetViewMatrix() const { return lookAt(m_position, m_position + m_front, m_up); }
     auto GetProjMatrix(const float width, const float height) const { return glm::perspective(m_FOV, width / height, m_near, m_far); }
