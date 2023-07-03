@@ -25,7 +25,7 @@ class Material {
 
    public:
     unsigned int m_texture = 0;
-    vec3 m_color;
+    vec3 m_color = vec3{0};
     float m_alpha;
     std::string m_texturePath;
     int m_indexOfModel; // the 2nd mesh of a model should have the 2nd material

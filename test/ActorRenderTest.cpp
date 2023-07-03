@@ -84,6 +84,8 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
             actor->m_renderComponent->drawMode = drawMode;
             actor->m_renderComponent->primitiveType = primitiveType;
             actor->InitRenderObject();
+            actor->m_renderComponent->objects[0]->m_material = std::make_shared<Material>();
+            actor->m_renderComponent->objects[0]->m_material->m_color = std::get<vec3>(attr["color"]);
         } else if (type == "model") {
             auto modelPath = std::get<std::string>(attr["model_path"]);
             auto materialModel =
@@ -108,8 +110,10 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
                 objects[i]->m_material = std::make_shared<Material>();
                 objects[i]->m_material->m_indexOfModel = i;
                 objects[i]->m_material->m_texturePath = std::filesystem::path(modelPath)/ materialModel.map_kd[i];
+                objects[i]->m_material->m_color = materialModel.Kd[i];
                 objects[i]->m_coords =  materialModel.textureCoords[i];
                 objects[i]->m_normals =  materialModel.normalCoords[i];
+
             }
         } else if (type == "sphere") {
             auto geoSphere =
@@ -120,6 +124,8 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
             actor->m_renderComponent->drawMode = drawMode;
             actor->m_renderComponent->primitiveType = primitiveType;
             actor->InitRenderObject();
+            actor->m_renderComponent->objects[0]->m_material = std::make_shared<Material>();
+            actor->m_renderComponent->objects[0]->m_material->m_color = std::get<vec3>(attr["color"]);
         }
         PHY_ASSERT(actor, "Config error, Actor is null!")
 

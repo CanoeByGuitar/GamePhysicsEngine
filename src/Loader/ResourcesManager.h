@@ -22,10 +22,14 @@ struct MaterialModel{
     // texture map
     std::vector<std::string> map_kd; // diffuse map
 
+    // other attributes
+    std::vector<vec3> Kd;
+
     MaterialModel(const GeoModelPtr& model,
                   const std::vector<std::vector<vec2>>& textureCoords,
                   const std::vector<std::vector<vec3>>& normalCoords,
-                  const std::vector<std::string>& mapKd);
+                  const std::vector<std::string>& mapKd,
+                  const std::vector<vec3>& kd);
 };
 
 class ResourceManager{

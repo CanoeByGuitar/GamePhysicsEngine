@@ -100,6 +100,7 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
     std::vector<std::vector<vec3>> retNormals;
     std::vector<std::vector<vec2>> retCoords;
     std::vector<std::string> retMapKds;  // diffuse maps
+    std::vector<vec3> retKds;
     PHY_INFO("Load Model at : {}",
              std::string(std::filesystem::current_path() / "../../" / path));
     if (loader.LoadFile(std::filesystem::current_path() / "../../" / path)) {
@@ -110,6 +111,7 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
             const auto& indices = mesh.Indices;
             auto map_kd = mesh.MeshMaterial.map_Kd;
             retMapKds.push_back(map_kd);
+            retKds.emplace_back(mesh.MeshMaterial.Kd.X, mesh.MeshMaterial.Kd.Y, mesh.MeshMaterial.Kd.Z);
             auto geoMesh = geo::Mesh();
             for (int i = 0; i < indices.size(); i += 3) {
                 auto tri =
@@ -189,7 +191,7 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
         PHY_ERROR("Cannot load model file!");
     }
 
-    return {retModel, retCoords, retNormals, retMapKds};
+    return {retModel, retCoords, retNormals, retMapKds, retKds};
 }
 
 using JsonValueType = std::variant<vec3, float, std::string>;
@@ -239,12 +241,14 @@ std::unordered_map<std::string, ObjectsDictType> ResourceManager::LoadJsonFile(
     return config;
 }
 
+
 MaterialModel::MaterialModel(
     const GeoModelPtr& model,
     const std::vector<std::vector<vec2>>& textureCoords,
     const std::vector<std::vector<vec3>>& normalCoords,
-    const std::vector<std::string>& mapKd)
+    const std::vector<std::string>& mapKd, const std::vector<vec3>& kd)
     : model(model),
       textureCoords(textureCoords),
       normalCoords(normalCoords),
-      map_kd(mapKd) {}
+      map_kd(mapKd),
+      Kd(kd) {}

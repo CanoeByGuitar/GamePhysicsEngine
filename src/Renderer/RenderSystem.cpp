@@ -165,6 +165,7 @@ void RenderSystem::renderObjectsWithTextures(
             auto& shader = m_shaderCache.at(objectPtr->m_name);
             shader.Bind();
             shader.SetUniform("model", glm::mat4(1.0f));
+            shader.SetUniform("color", objectPtr->m_material->m_color);
             if (objectPtr->m_drawMode != DrawMode::STATIC) {
                 objectPtr->SetupVerticesBuffer();
                 objectPtr->SetPipelineData();
@@ -190,12 +191,7 @@ void RenderSystem::renderObjectsNoTextures(
             auto& shader = m_shaderCache.at(objectPtr->m_name);
             shader.Bind();
             shader.SetUniform("model", glm::mat4(1.0f));
-            //                if(glm::all(glm::greaterThanEqual(objectPtr->GetColor(), vec3{0}))){
-            //                    shader.SetUniform("color", objectPtr->GetColor());
-            //                }else{
-            //                    shader.SetUniform("color", vec3(227,75,33) / 255.f);
-            //                }
-            shader.SetUniform("color", vec3(227, 75, 33) / 255.f);
+            shader.SetUniform("color", objectPtr->m_material->m_color);
             if (objectPtr->m_drawMode != DrawMode::STATIC) {
                 objectPtr->SetupVerticesBuffer();
                 objectPtr->SetPipelineData();
