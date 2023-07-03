@@ -3,12 +3,11 @@
     {
       "name" : "cloth",
       "type" : "model",
-      "shader_name" : "test",
-      "color" : [0, 0.8, 0.6],
+      "shader_name" : "texture",
+      "color" : [0, 0, 0],
       "drawMode": "dynamic",
       "primitiveType": "line",
-      "model_path": "resource/models/dress.obj",
-      "temp": "resource/models/cloth20x20(small).obj"
+      "model_path": "resource/models/dress.obj"
     },
     {
       "name" : "ball",
