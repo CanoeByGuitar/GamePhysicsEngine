@@ -22,7 +22,6 @@ struct RenderComponent {
     std::vector<RenderObjPtr> objects;
     renderer::DrawMode drawMode;
     renderer::PrimitiveType primitiveType;
-
 };
 
 struct PhysicsComponent {
@@ -55,7 +54,8 @@ class AabbActor : public Actor {
 
 class ModelActor : public Actor{
    public:
-    ModelActor(GeoModelPtr model, std::string name);
+    ModelActor(GeoModelPtr model,
+               std::string name);
     void InitRenderObject() override;
     void InitPhysicsObject() override;
    private:

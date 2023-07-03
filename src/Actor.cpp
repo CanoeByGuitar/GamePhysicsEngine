@@ -20,8 +20,10 @@ void AabbActor::InitPhysicsObject() {
     m_physicsComponent->object = std::make_shared<RigidBodyBox>(m_geometry);
 }
 
-ModelActor::ModelActor(GeoModelPtr model, std::string name)
-    : m_geometry(std::move(model)), Actor(std::move(name)) {
+ModelActor::ModelActor(GeoModelPtr model,
+                       std::string name)
+    : m_geometry(std::move(model)),
+      Actor(std::move(name)){
     m_renderComponent = std::make_shared<RenderComponent>();
     m_geometryCopy = m_geometry.get();
 }

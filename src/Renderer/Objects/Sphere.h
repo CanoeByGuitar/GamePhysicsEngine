@@ -18,14 +18,13 @@ class Sphere : public Object {
     using sphere = geo::Sphere;
 
    public:
-        Sphere(const char* name,
-             const std::shared_ptr<sphere>& _sphere,
-             DrawMode mode = DrawMode::DYNAMIC,
-             PrimitiveType type = PrimitiveType::TRIANGLE)
-                : Object(name, mode, type), m_sphere(_sphere)
-        {}
+    Sphere(const char* name, const std::shared_ptr<sphere>& _sphere,
+           DrawMode mode = DrawMode::DYNAMIC,
+           PrimitiveType type = PrimitiveType::TRIANGLE,
+           MaterialPtr mtl = nullptr)
+        : Object(name, mode, type, std::move(mtl)), m_sphere(_sphere) {}
 
-        void SetPipelineData() override {
+    void SetPipelineData() override {
         m_VAO.Init();
         m_VAO.Bind();
 
@@ -37,9 +36,9 @@ class Sphere : public Object {
                            m_indices.data(), m_drawMode);
 
         m_VAO.EnableAttribute(0, 3, sizeof(SphereVertex), (void*)0);
-        }
+    }
 
-        void SetupVerticesBuffer() override {
+    void SetupVerticesBuffer() override {
         const int slices = 20;  // 经度切片数
         const int stacks = 20;  // 纬度切片数
 
@@ -87,14 +86,13 @@ class Sphere : public Object {
                 }
             }
         }
+    }
 
-        }
-
-        void SetMaterial() override {
+    void SetMaterial() override {
         PHY_ASSERT(1, "No Sphere Material For now!");
-        }
+    }
 
-        void Draw() override {
+    void Draw() override {
         if (m_primitiveType == PrimitiveType::LINE) {
             //                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT,
@@ -104,11 +102,11 @@ class Sphere : public Object {
             glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
                            nullptr);
         }
-        }
+    }
 
-    private:
-        GeoSpherePtr m_sphere;
-        std::vector<SphereVertex> m_vertices;
+   private:
+    GeoSpherePtr m_sphere;
+    std::vector<SphereVertex> m_vertices;
 };
 }  // namespace renderer
 

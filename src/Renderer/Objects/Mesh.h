@@ -25,8 +25,9 @@ class Mesh : public Object {
    public:
     Mesh(const char* name, GeoMeshPtr  GeoMesh,
          DrawMode mode = DrawMode::DYNAMIC,
-         PrimitiveType type = PrimitiveType::TRIANGLE)
-        : Object(name, mode, type), m_geoMesh(std::move(GeoMesh)) {}
+         PrimitiveType type = PrimitiveType::TRIANGLE,
+         MaterialPtr  mtl = nullptr)
+        : Object(name, mode, type, std::move(mtl)), m_geoMesh(std::move(GeoMesh)) {}
 
     void SetPipelineData() override {
         m_VAO.Init();
@@ -51,9 +52,11 @@ class Mesh : public Object {
         m_vertices.reserve(m_geoMesh->vertices.size());
         m_indices.clear();
         m_indices.reserve(m_geoMesh->indices.size());
-        for(auto & vertex : m_geoMesh->vertices){
+        for(int i = 0; i < m_geoMesh->vertices.size(); i++){
             m_vertices.emplace_back(
-                    vertex
+                m_geoMesh->vertices[i],
+                m_normals[i],
+                m_coords[i]
                 );
         }
         m_indices = m_geoMesh->indices;

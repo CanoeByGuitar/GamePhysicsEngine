@@ -9,7 +9,24 @@
 #include <filesystem>
 #include <Geometry/Geometry.h>
 #include "json.hpp"
+#include <utility>
 #include <variant>
+
+struct MaterialModel{
+    // vertices, indices
+    GeoModelPtr model;
+    // vertices texture coords, normals
+    std::vector<std::vector<vec2>> textureCoords;
+    std::vector<std::vector<vec3>> normalCoords;
+
+    // texture map
+    std::vector<std::string> map_kd; // diffuse map
+
+    MaterialModel(const GeoModelPtr& model,
+                  const std::vector<std::vector<vec2>>& textureCoords,
+                  const std::vector<std::vector<vec3>>& normalCoords,
+                  const std::vector<std::string>& mapKd);
+};
 
 class ResourceManager{
 public:
@@ -27,6 +44,7 @@ public:
     std::string LoadTextFile(const std::filesystem::path& path) const;
 
     geo::Model& LoadModelFileNoMaterial(const std::filesystem::path& path, bool deduplicated = false) const;
+    MaterialModel LoadModelFileWithMaterial(const std::filesystem::path& path, bool deduplicated = false) const;
 
     using json = nlohmann::json;
     using JsonValueType = std::variant<vec3, float, std::string>;

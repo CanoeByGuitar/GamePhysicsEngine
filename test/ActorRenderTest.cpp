@@ -7,10 +7,10 @@
 //
 
 #include <Engine.h>
-#include <Renderer/Scene.h>
+#include <Loader/ResourcesManager.h>
 #include <Renderer/Objects/Cube.h>
 #include <Renderer/Objects/Mesh.h>
-#include <Loader/ResourcesManager.h>
+#include <Renderer/Scene.h>
 
 using namespace renderer;
 class MyGui : public GuiSystem {
@@ -67,11 +67,19 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
             actor = new AabbActor(geoCube,
                                   std::get<std::string>(attr["shader_name"]));
         } else if (type == "model") {
-            auto geoModel = std::make_shared<geo::Model>(
-                ResourceManager::GetInstance().LoadModelFileNoMaterial(
-                    std::get<std::string>(attr["model_path"]), false));
-            actor = new ModelActor(geoModel,
-                                   std::get<std::string>(attr["shader_name"]));
+            auto materialModel =
+                ResourceManager::GetInstance().LoadModelFileWithMaterial(
+                    std::get<std::string>(attr["model_path"]), false);
+            auto geoModel = materialModel.model;
+            actor = new ModelActor(
+                geoModel, std::get<std::string>(attr["shader_name"]));
+            auto objects = actor->m_renderComponent->objects;
+            for(int i = 0; i < objects.size(); i++){
+                objects[i]->m_material->m_indexOfModel = i;
+                objects[i]->m_material->m_texturePath = materialModel.map_kd[i];
+                objects[i]->m_coords =  materialModel.textureCoords[i];
+                objects[i]->m_normals =  materialModel.normalCoords[i];
+            }
         } else if (type == "sphere") {
             auto geoSphere =
                 std::make_shared<geo::Sphere>(std::get<vec3>(attr["center"]),
@@ -98,7 +106,6 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
     }
     return world;
 }
-
 
 int main() {
     std::vector<Actor*> world;

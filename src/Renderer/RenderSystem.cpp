@@ -62,7 +62,6 @@ namespace renderer{
         glClearColor(control::clear_color.x * control::clear_color.w, control::clear_color.y * control::clear_color.w, control::clear_color.z * control::clear_color.w, control::clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
     }
 
     void RenderSystem::LoadStaticObjects(RenderSystem::RenderListIterator renderListBegin,
@@ -72,6 +71,11 @@ namespace renderer{
             auto objectPtr = *begin;
             objectPtr->SetupVerticesBuffer();
             objectPtr->SetPipelineData();
+
+            // if has material load it
+            if(!objectPtr->m_material->m_path.empty()){
+                objectPtr->m_material->Load();
+            }
             begin++;
         }
     }
