@@ -3,13 +3,22 @@
     {
       "name" : "ground",
       "type" : "cube",
-      "pos" : [0, 0, 0],
-      "halfSize" : [1, 1, 1],
+      "pos" : [10, 0, 0],
+      "halfSize" : [1, 1.2, 1],
       "shader_name" : "test",
       "color" : [1, 0, 0],
-      "drawMode": "static",
+      "drawMode": "dynamic",
       "primitiveType": "triangle",
       "model_path": ""
+    },
+    {
+      "name" : "marry",
+      "type" : "model",
+      "shader_name" : "texture",
+      "color" : [0, 0.8, 0.6],
+      "drawMode": "static",
+      "primitiveType": "triangle",
+      "model_path": "resource/models/Marry/Marry.obj"
     }
   ]
 }

@@ -52,6 +52,8 @@ class Object {
     // for material mesh
     std::vector<vec2> m_coords;
     std::vector<vec3> m_normals;
+
+
 };
 
 }  // namespace renderer

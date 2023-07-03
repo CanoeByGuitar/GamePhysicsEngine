@@ -5,11 +5,14 @@
 #ifndef GAMEPHYSICSINONEWEEKEND_LOG_H
 #define GAMEPHYSICSINONEWEEKEND_LOG_H
 
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
+#include <iostream>
+#include <fstream>
 
 #define TICK(x) auto bench_##x = std::chrono::system_clock::now();
 #define TOCK(x) spdlog::info("-------{}: {:.1f}ms", #x, std::chrono::duration<double, std::milli>(std::chrono::system_clock::now() - bench_##x).count());
@@ -18,6 +21,7 @@ using vec2 = glm::vec2;
 using vec3 = glm::vec3;
 using vec4 = glm::vec4;
 using mat3 = glm::mat3;
+
 
 
 class DefaultSink : public spdlog::sinks::sink {
@@ -223,6 +227,23 @@ struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
 };
 
 
+#include <spdlog/sinks/basic_file_sink.h>
+inline void LogToFile(const std::string& fileName, const std::string& log){
+    std::ofstream file(fileName);
+    if(file.is_open()){
+        file << log << std::endl;
+    }
+}
+
+
+inline void LogToFile(const std::string& fileName, const std::vector<vec2>& vec){
+    std::ofstream file(std::filesystem::current_path() / fileName);
+    if(file.is_open()){
+        for(int i = 0; i < vec.size(); i++){
+            file << " (" << vec[i].x << ", " << vec[i].y <<  ")" << std::endl;
+        }
+    }
+}
 
 
 #endif //GAMEPHYSICSINONEWEEKEND_LOG_H

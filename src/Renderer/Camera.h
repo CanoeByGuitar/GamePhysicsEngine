@@ -7,6 +7,7 @@
 
 #include <Base/Log.h>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "Input.h"
 
@@ -44,7 +45,7 @@ private:
     vec3 m_up = vec3(0.f, 1.f, 0.f);
     vec3 m_right;
     const vec3 m_worldUp = vec3(0.f, 1.f, 0.f);
-    float m_near = 1.0f, m_far = 100.0f;
+    float m_near = 0.001f, m_far = 100.0f;
 
     float m_yaw = -90.0f;
     float m_pitch = 0.0f;

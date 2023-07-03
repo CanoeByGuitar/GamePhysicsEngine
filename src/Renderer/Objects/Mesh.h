@@ -43,8 +43,8 @@ class Mesh : public Object {
                            m_indices.data(), m_drawMode);
 
         m_VAO.EnableAttribute(0, 3, sizeof(MeshVertex), (void*)0);
-        m_VAO.EnableAttribute(1, 3, sizeof(MeshVertex), (void*)3);
-        m_VAO.EnableAttribute(2, 2, sizeof(MeshVertex), (void*)6);
+        m_VAO.EnableAttribute(1, 3, sizeof(MeshVertex), (void*)(3 * sizeof(float)));
+        m_VAO.EnableAttribute(2, 2, sizeof(MeshVertex), (void*)(6 * sizeof(float)));
     };
 
     void SetupVerticesBuffer() override {
@@ -53,10 +53,13 @@ class Mesh : public Object {
         m_indices.clear();
         m_indices.reserve(m_geoMesh->indices.size());
         for(int i = 0; i < m_geoMesh->vertices.size(); i++){
+            vec3 normal = (i < m_normals.size()) ? m_normals[i] : vec3(0);
+            vec2 coord = (i < m_coords.size()) ? m_coords[i] : vec2(0);
+//            PHY_INFO("coord {} : {}", i, m_coords[i]);
             m_vertices.emplace_back(
                 m_geoMesh->vertices[i],
-                m_normals[i],
-                m_coords[i]
+                normal,
+                coord
                 );
         }
         m_indices = m_geoMesh->indices;

@@ -99,11 +99,12 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
     auto retModel = std::make_shared<geo::Model>();
     std::vector<std::vector<vec3>> retNormals;
     std::vector<std::vector<vec2>> retCoords;
-    std::vector<std::string> retMapKds; // diffuse maps
+    std::vector<std::string> retMapKds;  // diffuse maps
     PHY_INFO("Load Model at : {}",
              std::string(std::filesystem::current_path() / "../../" / path));
     if (loader.LoadFile(std::filesystem::current_path() / "../../" / path)) {
         auto model = loader.LoadedMeshes;
+        int index = 0;
         for (const auto& mesh : model) {
             const auto& vertices = mesh.Vertices;
             const auto& indices = mesh.Indices;
@@ -132,15 +133,12 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
                 m_vertices[i] =
                     vec3(vertices[i].Position.X, vertices[i].Position.Y,
                          vertices[i].Position.Z);
-                m_coord[i] = vec2(
-                    vertices[i].TextureCoordinate.X,
-                    vertices[i].TextureCoordinate.Y
-                    );
-                m_normal[i] = vec3(
-                    vertices[i].Normal.X,
-                    vertices[i].Normal.Y,
-                    vertices[i].Normal.Z
-                    );
+
+                // confusing !!! why flipped y
+                m_coord[i] = vec2(vertices[i].TextureCoordinate.X,
+                                  1 - vertices[i].TextureCoordinate.Y);
+                m_normal[i] = vec3(vertices[i].Normal.X, vertices[i].Normal.Y,
+                                   vertices[i].Normal.Z);
             }
             auto m_indices = indices;
 
@@ -184,7 +182,8 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
 
             retNormals.push_back(m_normal);
             retCoords.push_back(m_coord);
-
+            LogToFile(std::to_string(index) + ".txt", m_coord);
+            index++;
         }
     } else {
         PHY_ERROR("Cannot load model file!");
@@ -192,7 +191,6 @@ MaterialModel ResourceManager::LoadModelFileWithMaterial(
 
     return {retModel, retCoords, retNormals, retMapKds};
 }
-
 
 using JsonValueType = std::variant<vec3, float, std::string>;
 using ObjectsDictType = std::unordered_map<std::string, JsonValueType>;

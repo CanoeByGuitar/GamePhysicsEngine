@@ -50,6 +50,7 @@ class MyGui : public GuiSystem {
     }
 };
 
+
 std::unordered_map<std::string, Actor*> GenWorldFromConfig(
     const std::filesystem::path& path) {
     std::unordered_map<std::string, Actor*> world;
@@ -58,25 +59,55 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
         auto attr = item.second;
 
         Actor* actor = nullptr;
+        ///////// obj renderer settings
+        auto drawMode = DYNAMIC;
+        auto primitiveType = TRIANGLE;
+        if (std::get<std::string>(attr["drawMode"]) == "dynamic") {
+            drawMode = DYNAMIC;
+        } else {
+            drawMode = STATIC;
+        }
+        if (std::get<std::string>(attr["primitiveType"]) == "triangle") {
+            primitiveType = PrimitiveType::TRIANGLE;
+        } else {
+            primitiveType = PrimitiveType::LINE;
+        }
+
         //////// obj type
         auto type = std::get<std::string>(attr["type"]);
         if (type == "cube") {
             auto geoCube =
-                std::make_shared<geo::AABB>(std::get<vec3>(attr["m_pos"]),
+                std::make_shared<geo::AABB>(std::get<vec3>(attr["pos"]),
                                             std::get<vec3>(attr["halfSize"]));
             actor = new AabbActor(geoCube,
                                   std::get<std::string>(attr["shader_name"]));
+            actor->m_renderComponent->drawMode = drawMode;
+            actor->m_renderComponent->primitiveType = primitiveType;
+            actor->InitRenderObject();
         } else if (type == "model") {
+            auto modelPath = std::get<std::string>(attr["model_path"]);
             auto materialModel =
                 ResourceManager::GetInstance().LoadModelFileWithMaterial(
-                    std::get<std::string>(attr["model_path"]), false);
+                    modelPath, true);
+            // resources/models/Marry/Marry.obj ==> resources/models/Marry
+            std::string::iterator it = modelPath.end();
+            while(*it != '/'){
+                it--;
+            }
+            modelPath.erase(it, modelPath.end());
+
+
             auto geoModel = materialModel.model;
             actor = new ModelActor(
                 geoModel, std::get<std::string>(attr["shader_name"]));
+            actor->m_renderComponent->drawMode = drawMode;
+            actor->m_renderComponent->primitiveType = primitiveType;
+            actor->InitRenderObject();
             auto objects = actor->m_renderComponent->objects;
             for(int i = 0; i < objects.size(); i++){
+                objects[i]->m_material = std::make_shared<Material>();
                 objects[i]->m_material->m_indexOfModel = i;
-                objects[i]->m_material->m_texturePath = materialModel.map_kd[i];
+                objects[i]->m_material->m_texturePath = std::filesystem::path(modelPath)/ materialModel.map_kd[i];
                 objects[i]->m_coords =  materialModel.textureCoords[i];
                 objects[i]->m_normals =  materialModel.normalCoords[i];
             }
@@ -86,22 +117,14 @@ std::unordered_map<std::string, Actor*> GenWorldFromConfig(
                                               std::get<float>(attr["radius"]));
             actor = new SphereActor(geoSphere,
                                     std::get<std::string>(attr["shader_name"]));
+            actor->m_renderComponent->drawMode = drawMode;
+            actor->m_renderComponent->primitiveType = primitiveType;
+            actor->InitRenderObject();
         }
         PHY_ASSERT(actor, "Config error, Actor is null!")
 
-        ///////// obj renderer settings
-        //        actor->m_renderComponent->SetColor(std::get<vec3>(attr["color"]));
-        if (std::get<std::string>(attr["drawMode"]) == "dynamic") {
-            actor->m_renderComponent->drawMode = DYNAMIC;
-        } else {
-            actor->m_renderComponent->drawMode = STATIC;
-        }
-        if (std::get<std::string>(attr["primitiveType"]) == "triangle") {
-            actor->m_renderComponent->primitiveType = PrimitiveType::TRIANGLE;
-        } else {
-            actor->m_renderComponent->primitiveType = PrimitiveType::LINE;
-        }
-        actor->InitRenderObject();
+
+
         world[item.first] = actor;
     }
     return world;

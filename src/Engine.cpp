@@ -66,9 +66,9 @@ void Engine::Init() {
             m_scene->AddObject(obj);
         }
     }
-    m_renderer.Init();
-
     auto renderList = m_scene->GetObjects();
+    m_renderer.Init();
+    m_renderer.CompileShaders(renderList.cbegin(), renderList.cend());
     RenderSystem::LoadStaticObjects(renderList.cbegin(), renderList.cend());
 
     m_renderer.SetProjectionMatrix(m_camera);

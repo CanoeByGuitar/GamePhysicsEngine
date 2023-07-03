@@ -8,6 +8,7 @@
 #include <functional>
 #include <array>
 #include <Base/Log.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 
