@@ -13,12 +13,12 @@
     },
     {
       "name" : "ground",
-      "type" : "sphere",
-      "center": [0, -100, 0],
-      "radius": 100.0,
-      "shader_name" : "test",
-      "color" : [0.2, 0.4, 0.6],
-      "drawMode": "dynamic",
+      "type" : "cube",
+      "pos": [0, -5, 0],
+      "halfSize": [1000, 1, 1000],
+      "shader_name" : "tile",
+      "color" : [0.6, 0.6, 0.6],
+      "drawMode": "static",
       "primitiveType": "triangle"
     },
     {
