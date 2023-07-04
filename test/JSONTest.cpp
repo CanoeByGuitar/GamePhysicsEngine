@@ -9,7 +9,7 @@
 using json = nlohmann::json;
 
 int main(){
-    std::ifstream f("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/config/example.json");
+    std::ifstream f("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/config/BVH.json");
     json data = json::parse(f);
     for(const auto& obj : data["objects"]){
         printf("\n");

@@ -29,9 +29,9 @@ target_link_libraries(LogTest Base)
 add_executable(ActorRenderTest ActorRenderTest.cpp)
 target_link_libraries(ActorRenderTest Engine)
 
-#
-#add_executable(BVH BVHTest.cpp)
-#target_link_libraries(BVH Engine)
+
+add_executable(BVH BVHTest.cpp)
+target_link_libraries(BVH Engine)
 #
 #add_executable(JSON JSONTest.cpp)
 #target_link_libraries(JSON Loader)

@@ -14,10 +14,10 @@
     {
       "name" : "marry",
       "type" : "model",
-      "shader_name" : "test",
+      "shader_name" : "texture",
       "color" : [0, 0.8, 0.6],
       "drawMode": "dynamic",
-      "primitiveType": "line",
+      "primitiveType": "triangle",
       "model_path": "resource/models/Marry/Marry.obj"
     }
   ]

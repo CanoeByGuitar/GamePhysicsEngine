@@ -10,7 +10,10 @@ AabbActor::AabbActor(GeoAabbPtr cube, std::string name)
     m_geometryCopy = m_geometry.get();
 }
 
-void AabbActor::InitRenderObject() {
+void AabbActor::InitRenderObject(DrawMode drawMode,
+                                 PrimitiveType primitiveType) {
+    m_renderComponent->drawMode = drawMode;
+    m_renderComponent->primitiveType = primitiveType;
     m_renderComponent->objects.push_back(std::make_shared<renderer::Cube>(
         m_name.c_str(), m_geometry, m_renderComponent->drawMode,
         m_renderComponent->primitiveType));
@@ -28,7 +31,10 @@ ModelActor::ModelActor(GeoModelPtr model,
     m_geometryCopy = m_geometry.get();
 }
 
-void ModelActor::InitRenderObject() {
+void ModelActor::InitRenderObject(DrawMode drawMode,
+                                  PrimitiveType primitiveType) {
+    m_renderComponent->drawMode = drawMode;
+    m_renderComponent->primitiveType = primitiveType;
     for (auto& mesh : m_geometry->m_meshes) {
         m_renderComponent->objects.push_back(std::make_shared<renderer::Mesh>(
             m_name.c_str(), std::shared_ptr<geo::Mesh>(&mesh),
@@ -46,7 +52,10 @@ SphereActor::SphereActor(GeoSpherePtr sphere, std::string name)
     m_renderComponent = std::make_shared<RenderComponent>();
     m_geometryCopy = m_geometry.get();
 }
-void SphereActor::InitRenderObject() {
+void SphereActor::InitRenderObject(DrawMode drawMode,
+                                   PrimitiveType primitiveType) {
+    m_renderComponent->drawMode = drawMode;
+    m_renderComponent->primitiveType = primitiveType;
     m_renderComponent->objects.push_back(
         std::make_shared<renderer::Sphere>(
             m_name.c_str(),
@@ -68,7 +77,10 @@ ParticlesActor::ParticlesActor(const GeoParticlesPtr& particle, std::string name
     m_geometryCopy = m_geometry.get();
 }
 
-void ParticlesActor::InitRenderObject() {
+void ParticlesActor::InitRenderObject(DrawMode drawMode,
+                                      PrimitiveType primitiveType) {
+    m_renderComponent->drawMode = drawMode;
+    m_renderComponent->primitiveType = primitiveType;
     m_renderComponent->objects.push_back(
         std::make_shared<renderer::Particles>(
             m_name.c_str(),

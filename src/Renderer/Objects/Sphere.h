@@ -21,7 +21,7 @@ class Sphere : public Object {
     Sphere(const char* name, const std::shared_ptr<sphere>& _sphere,
            DrawMode mode = DrawMode::DYNAMIC,
            PrimitiveType type = PrimitiveType::TRIANGLE,
-           MaterialPtr mtl = nullptr)
+           MaterialPtr mtl = std::make_shared<Material>())
         : Object(name, mode, type, std::move(mtl)), m_sphere(_sphere) {}
 
     void SetPipelineData() override {

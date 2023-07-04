@@ -28,11 +28,21 @@ struct PhysicsComponent {
     std::shared_ptr<MovableObject> object;
 };
 
+using renderer::DrawMode;
+using renderer::PrimitiveType;
+
 class Actor {
    public:
     Actor(std::string name):m_name(std::move(name)){};
-    virtual void InitRenderObject() = 0;
+    virtual void InitRenderObject(DrawMode drawMode = DrawMode::DYNAMIC,
+                                  PrimitiveType primitiveType = PrimitiveType::TRIANGLE) = 0;
     virtual void InitPhysicsObject() = 0;
+
+    void SetRenderColor(const vec3& color) {
+        for(const auto& obj : m_renderComponent->objects){
+            obj->m_material->m_color = color;
+        }
+    }
 
    public:
     std::shared_ptr<RenderComponent> m_renderComponent;
@@ -45,7 +55,8 @@ class Actor {
 class AabbActor : public Actor {
    public:
     AabbActor(GeoAabbPtr cube, std::string name);
-    void InitRenderObject() override;
+    void InitRenderObject(DrawMode drawMode = DrawMode::DYNAMIC,
+                          PrimitiveType primitiveType = PrimitiveType::TRIANGLE) override;
     void InitPhysicsObject() override;
 
    private:
@@ -56,7 +67,8 @@ class ModelActor : public Actor{
    public:
     ModelActor(GeoModelPtr model,
                std::string name);
-    void InitRenderObject() override;
+    void InitRenderObject(DrawMode drawMode = DrawMode::DYNAMIC,
+                          PrimitiveType primitiveType = PrimitiveType::TRIANGLE) override;
     void InitPhysicsObject() override;
    private:
     GeoModelPtr m_geometry;
@@ -65,7 +77,8 @@ class ModelActor : public Actor{
 class SphereActor : public Actor{
    public:
     SphereActor(GeoSpherePtr sphere, std::string name);
-    void InitRenderObject() override;
+    void InitRenderObject(DrawMode drawMode = DrawMode::DYNAMIC,
+                          PrimitiveType primitiveType = PrimitiveType::TRIANGLE) override;
     void InitPhysicsObject() override;
    private:
     GeoSpherePtr m_geometry;
@@ -74,7 +87,8 @@ class SphereActor : public Actor{
 class ParticlesActor : public Actor{
    public:
     ParticlesActor(const GeoParticlesPtr& particle, std::string name);
-    void InitRenderObject() override;
+    void InitRenderObject(DrawMode drawMode = DrawMode::DYNAMIC,
+                          PrimitiveType primitiveType = PrimitiveType::TRIANGLE) override;
     void InitPhysicsObject() override;
    private:
     GeoParticlesPtr m_geometry;

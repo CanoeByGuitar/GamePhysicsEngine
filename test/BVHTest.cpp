@@ -1,9 +1,5 @@
 //
-// Created by 王晨辉 on 2023/6/8.
-//
-//
-// Created by 王晨辉 on 2023/6/7.
-//
+
 
 //
 // Created by 王晨辉 on 2023/6/4.
@@ -17,6 +13,7 @@
 #include <Base/Color.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <variant>
+#include "Utils.h"
 
 using namespace renderer;
 
@@ -88,7 +85,7 @@ public:
 //        PHY_DEBUG("clear color in gui: {} in addr: ", control::clear_color);
 //        std::cout << &control::clear_color << std::endl;
         ImGui::ColorEdit3("ground color", (float *) &control::ground_color);
-        actor_ground->m_renderComponent->SetColor(control::ground_color);
+        actor_ground->m_renderComponent->objects[0]->m_material->m_color = control::ground_color;
 
         static bool isMultiBVHShow = false;
 
@@ -97,19 +94,19 @@ public:
             ImGui::SliderInt("bvhLevel", &control::show_level, 0, 20);
             for(const auto& item : BVHLevelMap){
                 if(item.second != control::show_level){
-                    item.first->isVisible = false;
+                    item.first->m_isVisible = false;
                 }else{
-                    item.first->isVisible = true;
+                    item.first->m_isVisible = true;
                 }
             }
         }else{
             if (ImGui::Button("NextNode")) {
                 for(const auto& item : BVHLevelMap){
-                    item.first->isVisible = false;
+                    item.first->m_isVisible = false;
                 }
                 if(!control::currNode) control::currNode = originNode;
                 else{
-                    NodeMap[control::currNode]->isVisible = true;
+                    NodeMap[control::currNode]->m_isVisible = true;
                     control::currNode = control::currNode->left;
                 }
                 counter++;
@@ -135,54 +132,6 @@ public:
 };
 
 
-std::unordered_map<std::string, Actor*> GenWorldFromConfig(const std::filesystem::path& path){
-    std::unordered_map<std::string, Actor*> world;
-    auto config = ResourceManager::GetInstance().LoadJsonFile(path);
-    for(const auto& item : config){
-        auto attr = item.second;
-
-        Actor* actor = nullptr;
-        //////// obj type
-        auto type = std::get<std::string>(attr["type"]);
-        if(type == "cube"){
-            auto geoCube = std::make_shared<geo::AABB>(
-                    std::get<vec3>(attr["m_pos"]),
-                    std::get<vec3>(attr["halfSize"])
-                    );
-            actor = new ActorBase<geo::AABB>(
-                    std::get<std::string>(attr["shader_name"]),
-                    geoCube);
-        }else if(type == "model"){
-            auto geoModel = std::make_shared<geo::Model>(
-                    ResourceManager::GetInstance().LoadModelFileNoMaterial(
-                            std::get<std::string>(attr["model_path"]),
-                                    true
-                    ));
-            actor = new ActorBase<geo::Model>(
-                    std::get<std::string>(attr["shader_name"]),
-                    geoModel);
-        }
-        PHY_ASSERT(actor, "Config error, Actor is null!")
-
-        ///////// obj renderer settings
-        actor->InitRenderObject();
-        actor->m_renderComponent->SetColor(std::get<vec3>(attr["color"]));
-        if(std::get<std::string>(attr["drawMode"])== "dynamic"){
-            actor->m_renderComponent->SetDrawMode(DYNAMIC);
-        }else{
-            actor->m_renderComponent->SetDrawMode(STATIC);
-        }
-        if(std::get<std::string>(attr["primitiveType"])== "triangle"){
-            actor->m_renderComponent->SetPrimitiveType(PrimitiveType::TRIANGLE);
-        }else{
-            actor->m_renderComponent->SetPrimitiveType(PrimitiveType::LINE);
-        }
-
-        world[item.first] = actor;
-    }
-    return world;
-}
-
 
 
 int main() {
@@ -191,18 +140,17 @@ int main() {
     std::vector<Actor *> world;
     world.reserve(300);
 
-//    extern std::string ROOT_DIR;
-    auto nameObjectMap = GenWorldFromConfig("resource/config/example.json");
+    auto nameObjectMap = GenWorldFromConfig("resource/config/BVH.json");
     for(auto & it : nameObjectMap){
         world.push_back(it.second);
     }
 
     ///////// for gui
-    ground_geo = std::shared_ptr<geo::AABB>(reinterpret_cast<geo::AABB*>(nameObjectMap["ground"]->m_geoPtrCopy));
-    actor_ground = dynamic_cast<ActorBase<geo::AABB> *>(nameObjectMap["ground"]);
+    ground_geo = std::shared_ptr<geo::AABB>(reinterpret_cast<geo::AABB*>(nameObjectMap["ground"]->m_geometryCopy));
+    actor_ground = dynamic_cast<AabbActor *>(nameObjectMap["ground"]);
 
     /////// BVH
-    auto geoModel = reinterpret_cast<geo::Model*>(nameObjectMap["marry"]->m_geoPtrCopy);
+    auto geoModel = reinterpret_cast<geo::Model*>(nameObjectMap["marry"]->m_geometryCopy);
     int index = 0;
     for (auto &mesh: geoModel->m_meshes) {
         geo::AccelerateMesh(mesh);
@@ -217,15 +165,13 @@ int main() {
         for (auto &item: boundMap) {
             for (auto &node: item.second) {
                 auto aabb = std::make_shared<geo::AABB>(node->bound);
-                auto actor_cube = new ActorBase<geo::AABB>("test", aabb);
+                auto actor_cube = new AabbActor(aabb, "test");
                 world.push_back(actor_cube);
-                actor_cube->InitRenderObject();
-                actor_cube->m_renderComponent->SetColor(ColorMap(item.first, 0, maxDepth));
-                actor_cube->m_renderComponent->SetDrawMode(DrawMode::STATIC);
-                actor_cube->m_renderComponent->SetPrimitiveType(PrimitiveType::LINE);
+                actor_cube->InitRenderObject(DrawMode::STATIC, PrimitiveType::LINE);
+                actor_cube->SetRenderColor(ColorMap(item.first, 0, maxDepth));
 
-                BVHLevelMap[actor_cube->m_renderComponent->object] = item.first;
-                NodeMap[node] = actor_cube->m_renderComponent->object;
+                BVHLevelMap[actor_cube->m_renderComponent->objects[0]] = item.first;
+                NodeMap[node] = actor_cube->m_renderComponent->objects[0];
 
             }
         }

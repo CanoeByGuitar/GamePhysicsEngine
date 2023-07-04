@@ -100,12 +100,8 @@ int main() {
         Actor* actor_ch =
             new ParticlesActor(std::make_shared<geo::Particles3D>(ch), "test");
 
-        actor_ch->m_renderComponent->primitiveType = (renderer::LINE);
-        actor_ch->m_renderComponent->drawMode = (renderer::STATIC);
-//        actor_ch->m_renderComponent->SetColor(
-//            ColorMap(level, 0, (int)chs.size() - 1));
-        actor_ch->InitRenderObject();
-
+        actor_ch->InitRenderObject(renderer::STATIC, renderer::LINE);
+        actor_ch->SetRenderColor(ColorMap(level, 0, (int)chs.size() - 1));
         world.push_back(actor_ch);
         level++;
     }
@@ -116,10 +112,8 @@ int main() {
         std::make_shared<geo::Particles3D>(p3),
             "test");
 
-    actor->m_renderComponent->primitiveType = (renderer::TRIANGLE);
-    actor->m_renderComponent->drawMode = (renderer::STATIC);
-//    actor->m_renderComponent->SetColor(vec3(1, 0, 0));
-    actor->InitRenderObject();
+    actor->InitRenderObject(renderer::STATIC, renderer::TRIANGLE);
+    actor->SetRenderColor({1, 0, 0});
     world.push_back(actor);
 
     auto gui = new MyGui;

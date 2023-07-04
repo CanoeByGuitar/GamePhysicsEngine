@@ -20,7 +20,7 @@ class Particles : public Object {
     Particles(const std::string& name,
               const std::shared_ptr<geo::Particles3D>& mParticles,
               DrawMode mode = DrawMode::STATIC, PrimitiveType type = TRIANGLE,
-              MaterialPtr mtl = nullptr)
+              MaterialPtr mtl = std::make_shared<Material>())
         : Object(name, mode, type, std::move(mtl)), m_particles(mParticles) {}
 
     void SetPipelineData() override {

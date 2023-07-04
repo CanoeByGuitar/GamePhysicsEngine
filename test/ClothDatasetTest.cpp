@@ -11,6 +11,7 @@
 #include <Renderer/Scene.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <variant>
+#include "Utils.h"
 
 using namespace renderer;
 
@@ -101,90 +102,6 @@ class MyGui : public GuiSystem {
     }
 };
 
-std::unordered_map<std::string, Actor*> GenWorldFromConfig(
-    const std::filesystem::path& path) {
-    std::unordered_map<std::string, Actor*> world;
-    auto config = ResourceManager::GetInstance().LoadJsonFile(path);
-    for (const auto& item : config) {
-        auto attr = item.second;
-
-        Actor* actor = nullptr;
-        ///////// obj renderer settings
-        auto drawMode = DYNAMIC;
-        auto primitiveType = TRIANGLE;
-        if (std::get<std::string>(attr["drawMode"]) == "dynamic") {
-            drawMode = DYNAMIC;
-        } else {
-            drawMode = STATIC;
-        }
-        if (std::get<std::string>(attr["primitiveType"]) == "triangle") {
-            primitiveType = PrimitiveType::TRIANGLE;
-        } else {
-            primitiveType = PrimitiveType::LINE;
-        }
-
-        //////// obj type
-        auto type = std::get<std::string>(attr["type"]);
-        if (type == "cube") {
-            auto geoCube =
-                std::make_shared<geo::AABB>(std::get<vec3>(attr["pos"]),
-                                            std::get<vec3>(attr["halfSize"]));
-            actor = new AabbActor(geoCube,
-                                  std::get<std::string>(attr["shader_name"]));
-            actor->m_renderComponent->drawMode = drawMode;
-            actor->m_renderComponent->primitiveType = primitiveType;
-            actor->InitRenderObject();
-            actor->m_renderComponent->objects[0]->m_material = std::make_shared<Material>();
-            actor->m_renderComponent->objects[0]->m_material->m_color = std::get<vec3>(attr["color"]);
-        } else if (type == "model") {
-            auto modelPath = std::get<std::string>(attr["model_path"]);
-            auto materialModel =
-                ResourceManager::GetInstance().LoadModelFileWithMaterial(
-                    modelPath, true);
-            // resources/models/Marry/Marry.obj ==> resources/models/Marry
-            std::string::iterator it = modelPath.end();
-            while(*it != '/'){
-                it--;
-            }
-            modelPath.erase(it, modelPath.end());
-
-
-            auto geoModel = materialModel.model;
-            actor = new ModelActor(
-                geoModel, std::get<std::string>(attr["shader_name"]));
-            actor->m_renderComponent->drawMode = drawMode;
-            actor->m_renderComponent->primitiveType = primitiveType;
-            actor->InitRenderObject();
-            auto objects = actor->m_renderComponent->objects;
-            for(int i = 0; i < objects.size(); i++){
-                objects[i]->m_material = std::make_shared<Material>();
-                objects[i]->m_material->m_indexOfModel = i;
-                objects[i]->m_material->m_texturePath = std::filesystem::path(modelPath)/ materialModel.map_kd[i];
-                objects[i]->m_material->m_color = materialModel.Kd[i];
-                objects[i]->m_coords =  materialModel.textureCoords[i];
-                objects[i]->m_normals =  materialModel.normalCoords[i];
-
-            }
-        } else if (type == "sphere") {
-            auto geoSphere =
-                std::make_shared<geo::Sphere>(std::get<vec3>(attr["center"]),
-                                              std::get<float>(attr["radius"]));
-            actor = new SphereActor(geoSphere,
-                                    std::get<std::string>(attr["shader_name"]));
-            actor->m_renderComponent->drawMode = drawMode;
-            actor->m_renderComponent->primitiveType = primitiveType;
-            actor->InitRenderObject();
-            actor->m_renderComponent->objects[0]->m_material = std::make_shared<Material>();
-            actor->m_renderComponent->objects[0]->m_material->m_color = std::get<vec3>(attr["color"]);
-        }
-        PHY_ASSERT(actor, "Config error, Actor is null!")
-
-
-
-        world[item.first] = actor;
-    }
-    return world;
-}
 
 int main() {
     PHY_LEVEL_DEBUG

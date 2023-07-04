@@ -21,7 +21,7 @@ class Cube : public Object {
     Cube(const char* name, const std::shared_ptr<AABB>& bound,
          DrawMode mode = DrawMode::DYNAMIC,
          PrimitiveType type = PrimitiveType::TRIANGLE,
-         MaterialPtr mtl = nullptr)
+         MaterialPtr mtl = std::make_shared<Material>())
         : Object(name, mode, type, std::move(mtl)), m_bound(bound) {}
 
     void SetPipelineData() override {

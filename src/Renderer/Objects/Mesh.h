@@ -26,7 +26,7 @@ class Mesh : public Object {
     Mesh(const char* name, GeoMeshPtr  GeoMesh,
          DrawMode mode = DrawMode::DYNAMIC,
          PrimitiveType type = PrimitiveType::TRIANGLE,
-         MaterialPtr  mtl = nullptr)
+         MaterialPtr  mtl = std::make_shared<Material>())
         : Object(name, mode, type, std::move(mtl)), m_geoMesh(std::move(GeoMesh)) {}
 
     void SetPipelineData() override {

@@ -17,7 +17,7 @@ class Object {
    public:
     explicit Object(std::string name, DrawMode mode = DrawMode::DYNAMIC,
                     PrimitiveType type = PrimitiveType::TRIANGLE,
-                    MaterialPtr  mtl = nullptr)
+                    MaterialPtr  mtl = std::make_shared<Material>())
         : m_name(std::move(name)),
           m_drawMode(mode),
           m_primitiveType(type),
