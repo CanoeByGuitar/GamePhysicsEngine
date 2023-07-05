@@ -68,16 +68,12 @@ class MyGui : public GuiSystem {
             isBallMoving = !isBallMoving;
         }
         if (isBallMoving) {
-            //            control::center.x = Input::GetInstance().GetMouseX();
-            //            control::center.y = Input::GetInstance().GetMouseY();
-            //            ball_geo->position = control::center;
-
-            ImGui::SliderFloat("ball center z", &position, 2, -2);
-            control::center = vec3(0.5, 0.5, position);
+            ImGui::SliderFloat("ball center z", &position, 10, -10);
+            control::center = vec3(0, 8, position);
             ball_geo->position = control::center;
         }
         static float radius;
-        ImGui::SliderFloat("ball radius", &radius, 0.01, 0.2);
+        ImGui::SliderFloat("ball radius", &radius, 1, 10);
         control::radius = radius;
         ball_geo->radius = control::radius;
 

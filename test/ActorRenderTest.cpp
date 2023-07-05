@@ -48,7 +48,7 @@ class MyGui : public GuiSystem {
 
 int main() {
     std::vector<Actor*> world;
-    auto nameObjectMap = GenWorldFromConfig("resource/config/test.json");
+    auto nameObjectMap = GenWorldFromConfig("resource/config/ActorRenderTest.json");
     for (auto& it : nameObjectMap) {
         world.push_back(it.second);
     }
