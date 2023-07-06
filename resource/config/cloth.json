@@ -3,10 +3,10 @@
     {
       "name" : "cloth",
       "type" : "model",
-      "shader_name" : "texture",
-      "color" : [0, 0, 0],
+      "shader_name" : "cloth_tile",
+      "color" : [0.2, 0.2, 0.2],
       "drawMode": "dynamic",
-      "primitiveType": "line",
+      "primitiveType": "triangle",
       "model_path": "resource/models/dress/dress.obj"
     },
     {
