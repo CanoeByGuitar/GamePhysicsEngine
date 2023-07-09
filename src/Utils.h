@@ -68,7 +68,10 @@ inline std::unordered_map<std::string, Actor*> GenWorldFromConfig(
                 objects[i]->m_coords =  materialModel.textureCoords[i];
                 objects[i]->m_normals =  materialModel.normalCoords[i];
             }
-            actor->SetRenderColor(std::get<vec3>(attr["color"]));
+            if(attr.find("color") != attr.end()){
+                actor->SetRenderColor(std::get<vec3>(attr["color"]));
+            }
+
         } else if (type == "sphere") {
             auto geoSphere =
                 std::make_shared<geo::Sphere>(std::get<vec3>(attr["center"]),

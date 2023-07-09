@@ -6,7 +6,7 @@
       "shader_name" : "cloth_tile",
       "color" : [0.2, 0.2, 0.2],
       "drawMode": "dynamic",
-      "primitiveType": "triangle",
+      "primitiveType": "line",
       "model_path": "resource/models/dress/dress.obj"
     },
     {

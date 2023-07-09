@@ -27,7 +27,7 @@ class MyGui : public GuiSystem {
             ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y),
             ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(250, 300), ImGuiCond_Once);
-        ImGui::Begin("Convex Hull");
+        ImGui::Begin("RenderTest");
         if (ImGui::IsWindowHovered()) {
             Input::GetInstance().disableMouse();
         } else {
