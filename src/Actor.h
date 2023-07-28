@@ -22,6 +22,8 @@ struct RenderComponent {
     std::vector<RenderObjPtr> objects;
     renderer::DrawMode drawMode;
     renderer::PrimitiveType primitiveType;
+
+    void SetNormals(const std::vector<std::vector<vec3>>& normals);
 };
 
 struct PhysicsComponent {

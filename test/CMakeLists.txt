@@ -2,8 +2,8 @@ add_executable(LogTest LogTest.cpp)
 target_link_libraries(LogTest Base)
 
 
-#add_executable(GLMTest GLMTest.cpp)
-#target_link_libraries(GLMTest Base Math)
+add_executable(GLMTest GLMTest.cpp)
+target_link_libraries(GLMTest Base Math)
 #
 #add_executable(BinReaderTest BinReaderTest.cpp)
 #target_link_libraries(BinReaderTest Loader)
@@ -41,3 +41,6 @@ target_link_libraries(ClothData Engine)
 
 add_executable(ConvexHull ConvexHull.cpp)
 target_link_libraries(ConvexHull Engine)
+
+add_executable(TetrahedronTest TetrahedronTest.cpp)
+target_link_libraries(TetrahedronTest Engine)

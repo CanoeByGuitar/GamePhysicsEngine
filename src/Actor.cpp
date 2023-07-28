@@ -4,6 +4,13 @@
 
 #include "Actor.h"
 
+void RenderComponent::SetNormals(const std::vector<std::vector<vec3>>& normals) {
+  for(int i = 0; i < objects.size(); i++){
+    objects[i]->m_normals = normals[i];
+  }
+}
+
+
 AabbActor::AabbActor(GeoAabbPtr cube, std::string name)
     : m_geometry(std::move(cube)), Actor(std::move(name)) {
     m_renderComponent = std::make_shared<RenderComponent>();
@@ -40,6 +47,7 @@ void ModelActor::InitRenderObject(DrawMode drawMode,
             m_name.c_str(), std::shared_ptr<geo::Mesh>(&mesh),
             m_renderComponent->drawMode, m_renderComponent->primitiveType));
     }
+
 }
 
 void ModelActor::InitPhysicsObject() {

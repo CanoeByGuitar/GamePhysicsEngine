@@ -61,11 +61,7 @@ void Engine::Init() {
 
     PHY_INFO("Initializing renderer...");
     m_scene = std::make_shared<Scene>();
-    for (auto& actor : m_world) {
-        for (const auto& obj : actor->m_renderComponent->objects) {
-            m_scene->AddObject(obj);
-        }
-    }
+    m_scene->ReadSceneFromActorVector(m_world);
     auto renderList = m_scene->GetObjects();
     m_renderer.Init();
     m_renderer.CompileShaders(renderList.cbegin(), renderList.cend());
@@ -100,6 +96,8 @@ void Engine::Execute() {
         ///////////// renderer
         m_camera.Update(dt);
         m_renderer.Update(m_camera);
+
+//        m_scene->UpdateSceneFromActorVector(m_world);
         auto renderList = m_scene->GetObjects();
         m_renderer.Render(m_camera, renderList.cbegin(), renderList.cend());
 

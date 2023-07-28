@@ -53,4 +53,5 @@ int main(){
     vec3 a(1, 1, 1);
     vec3 b(2, 2, 2);
     PHY_INFO("{}", a * b);
+    PHY_INFO("{}", 1.f / b);
 }
