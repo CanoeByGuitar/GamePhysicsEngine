@@ -7,64 +7,64 @@
 
 #include "TetrahedronMesh.h"
 
-namespace SimpleComplex{
+namespace SimpleComplex {
 
 
-class VertexIterator{
+class VertexIterator {
 public:
-  explicit VertexIterator(const TetrahedronMesh& tetMesh);
-  void Advance();
-  bool Done();
-  VertexPtr Current();
+  explicit VertexIterator(TetrahedronMesh& mesh);
+  void    Advance();
+  bool    Done();
+  Vertex& Current();
+  int     Idx() const { return m_idx; }
+
+private:
+  int              m_idx;
+  TetrahedronMesh& m_tetMesh;
+};
+
+class EdgeIterator {
+public:
+  explicit EdgeIterator(TetrahedronMesh& mesh);
+  void  Advance();
+  bool  Done();
+  Edge& Current();
 
 
 private:
-  int m_idx;
-  const TetrahedronMesh& m_tetMesh;
+  int              m_idx;
+  TetrahedronMesh& m_tetMesh;
 };
 
-class EdgeIterator{
+class FaceIterator {
 public:
-  explicit EdgeIterator(const TetrahedronMesh& tetMesh);
-  void Advance();
-  bool Done();
-  EdgePtr Current();
+  explicit FaceIterator(TetrahedronMesh& mesh);
+  void  Advance();
+  bool  Done();
+  Face& Current();
 
 
 private:
-  int m_idx;
-  const TetrahedronMesh& m_tetMesh;
+  int              m_idx;
+  TetrahedronMesh& m_tetMesh;
 };
 
-class FaceIterator{
+class TetIterator {
 public:
-  explicit FaceIterator(const TetrahedronMesh& tetMesh);
+  explicit TetIterator(TetrahedronMesh& mesh);
   void Advance();
   bool Done();
-  FacePtr Current();
+  Tet& Current();
 
 
 private:
-  int m_idx;
-  const TetrahedronMesh& m_tetMesh;
-};
-
-class TetIterator{
-public:
-  explicit TetIterator(const TetrahedronMesh& tetMesh);
-  void Advance();
-  bool Done();
-  TetPtr Current();
-
-
-private:
-  int m_idx;
-  const TetrahedronMesh& m_tetMesh;
+  int              m_idx;
+  TetrahedronMesh& m_tetMesh;
 };
 
 
 
-}
+}   // namespace SimpleComplex
 
 
 

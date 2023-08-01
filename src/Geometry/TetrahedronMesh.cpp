@@ -155,3 +155,8 @@ int SimpleComplex::TetrahedronMesh::AddTet(int a, int b, int c, int d) {
   return tet_cnt;
 }
 
+int SimpleComplex::TetrahedronMesh::AddVertex(const vec3& v) {
+  int vertex_cnt = (int)m_vertices.size();
+  m_vertices.emplace_back(vertex_cnt, v.x, v.y, v.z);
+  return vertex_cnt;
+}

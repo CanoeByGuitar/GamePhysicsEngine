@@ -8,13 +8,13 @@
 
 #include "TetrahedronMesh.h"
 
-namespace SimpleComplex{
-class TetBoolean{
+namespace SimpleComplex {
+class TetBoolean {
 public:
-  TetBoolean(const TetBoolean&) = delete;
+  TetBoolean(const TetBoolean&)            = delete;
   TetBoolean& operator=(const TetBoolean&) = delete;
 
-  static TetBoolean& GetInstance(){
+  static TetBoolean& GetInstance() {
     static TetBoolean instance;
     return instance;
   }
@@ -23,11 +23,31 @@ public:
   TetrahedronMesh Intersection(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
   TetrahedronMesh Difference(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
 
+  using TwoVecInt = std::pair<std::vector<int>, std::vector<int>>;
+
+  TwoVecInt AInB(TetrahedronMesh& A, TetrahedronMesh& B);
+  TetrahedronMesh AOutB(const TetrahedronMesh& A, const TetrahedronMesh& B);
+
+  void GetIntersectionLine(const SimpleComplex::TetrahedronMesh& A,
+                           const SimpleComplex::TetrahedronMesh& B);
+
+  TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
+
 
 private:
-  TetBoolean(){}
+  TetBoolean();
+
+  //  0: in
+  //  1: out
+  //  2: on
+  //  -1: else
+  std::vector<int> m_vertexFlag;
+
+  std::vector<int> m_vertexOnIntersection;
+
+
 };
-}
+}   // namespace SimpleComplex
 
 
 #endif   // GAMEPHYSICSINONEWEEKEND_TETBOOLEAN_H

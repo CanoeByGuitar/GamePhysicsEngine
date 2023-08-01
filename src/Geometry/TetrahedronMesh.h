@@ -66,6 +66,7 @@ struct FaceHash {
 
 class TetrahedronMesh {
 public:
+  TetrahedronMesh() = default;
   TetrahedronMesh(std::vector<Vertex>&& vertices, std::vector<int>&& indices);
   GeoMeshPtr ToGeoMesh() const;
   void       CreateVertexList(std::vector<Vertex>&& vertices);   // vertices => m_vertices
@@ -73,6 +74,8 @@ public:
   int  AddEdge(int a, int b);
   int  AddFace(int a, int b, int c);
   int  AddTet(int a, int b, int c, int d);
+
+  int AddVertex(const vec3& v);
   std::vector<Vertex> m_vertices;
   std::vector<Edge>   m_edges;
   std::vector<Face>   m_faces;

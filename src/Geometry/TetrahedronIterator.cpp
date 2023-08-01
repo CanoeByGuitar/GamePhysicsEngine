@@ -6,9 +6,9 @@
 
 namespace SimpleComplex {
 ////////// VertexIterator
-VertexIterator::VertexIterator(const TetrahedronMesh& tetMesh)
+VertexIterator::VertexIterator(TetrahedronMesh& mesh)
   : m_idx(0)
-  , m_tetMesh(tetMesh) {}
+  , m_tetMesh(mesh) {}
 
 
 void VertexIterator::Advance() {
@@ -20,15 +20,15 @@ bool VertexIterator::Done() {
 }
 
 
-VertexPtr VertexIterator::Current() {
+Vertex& VertexIterator::Current(){
   return m_tetMesh.m_vertices[m_idx];
 }
 
 
 ////////// EdgeIterator
-EdgeIterator::EdgeIterator(const TetrahedronMesh& tetMesh)
+EdgeIterator::EdgeIterator(TetrahedronMesh& mesh)
   : m_idx(0)
-  , m_tetMesh(tetMesh) {}
+  , m_tetMesh(mesh) {}
 
 
 void EdgeIterator::Advance() {
@@ -40,15 +40,15 @@ bool EdgeIterator::Done() {
 }
 
 
-EdgePtr EdgeIterator::Current() {
+Edge& EdgeIterator::Current() {
   return m_tetMesh.m_edges[m_idx];
 }
 
 
 ////////// FaceIterator
-FaceIterator::FaceIterator(const TetrahedronMesh& tetMesh)
+FaceIterator::FaceIterator(TetrahedronMesh& mesh)
   : m_idx(0)
-  , m_tetMesh(tetMesh) {}
+  , m_tetMesh(mesh) {}
 
 
 void FaceIterator::Advance() {
@@ -60,16 +60,16 @@ bool FaceIterator::Done() {
 }
 
 
-FacePtr FaceIterator::Current() {
+Face& FaceIterator::Current() {
   return m_tetMesh.m_faces[m_idx];
 }
 
 
 
 ////////// TetIterator
-TetIterator::TetIterator(const TetrahedronMesh& tetMesh)
+TetIterator::TetIterator(TetrahedronMesh& mesh)
   : m_idx(0)
-  , m_tetMesh(tetMesh) {}
+  , m_tetMesh(mesh) {}
 
 
 void TetIterator::Advance() {
@@ -81,7 +81,7 @@ bool TetIterator::Done() {
 }
 
 
-TetPtr TetIterator::Current() {
+Tet& TetIterator::Current() {
   return m_tetMesh.m_tets[m_idx];
 }
 
