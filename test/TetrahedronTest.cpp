@@ -71,7 +71,7 @@ int main() {
 
   actor = new ModelActor(model, "normal_map");
   world.push_back(actor);
-  actor->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+  actor->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::TRIANGLE);
   actor->SetRenderColor({1, 0, 0});
 
   /// normal

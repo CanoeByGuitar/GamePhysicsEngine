@@ -43,6 +43,10 @@ using VertexList = std::vector<std::shared_ptr<Vertex>>;
 using EdgeList   = std::vector<std::shared_ptr<Edge>>;
 using FaceList   = std::vector<std::shared_ptr<Face>>;
 using TetList    = std::vector<std::shared_ptr<Tet>>;
+using VertexPtr = std::shared_ptr<Vertex>;
+using EdgePtr = std::shared_ptr<Edge>;
+using FacePtr = std::shared_ptr<Face>;
+using TetPtr = std::shared_ptr<Tet>;
 
 
 class TetrahedronMesh {
@@ -56,6 +60,8 @@ public:
   FaceList m_faces;
   TetList m_tets;
 
+  std::vector<std::vector<int>> m_VF; // vertex to face
+  std::vector<std::vector<int>> m_VV; // vertex to vertex
 
 };
 
