@@ -24,7 +24,8 @@ public:
     std::vector<Vertex> vertices;
     std::vector<int>    indices;
     while (std::getline(file, line)) {
-      if(line.empty()) continue;
+      if (line.empty())
+        continue;
       if (line == "vert") {
         readingVertices = true;
         continue;
@@ -32,7 +33,7 @@ public:
 
       if (line == "tet") {
         readingTetrahedron = true;
-        readingVertices = false;
+        readingVertices    = false;
         continue;
       }
 
@@ -40,7 +41,8 @@ public:
         std::istringstream iss(line);
         float              x, y, z;
         iss >> x >> y >> z;
-        Vertex v{x, y, z};
+        int    vertex_cnt = static_cast<int>(vertices.size());
+        Vertex v{vertex_cnt, x, y, z};
         vertices.push_back(v);
       } else if (readingTetrahedron) {
         std::istringstream iss(line);

@@ -66,7 +66,6 @@ int main() {
   auto geoMesh = tet->ToGeoMesh();
   auto model   = std::make_shared<geo::Model>();
   model->m_meshes.push_back(*geoMesh);
-
   std::vector<Actor*> world;
 
   actor = new ModelActor(model, "normal_map");
@@ -76,10 +75,10 @@ int main() {
 
   /// normal
   std::vector<std::vector<vec3>> normals(1);
-  for (const auto& m_face : tet->m_faces) {
+  for (const auto& face : tet->m_faces) {
     // each triangle has 3 vertices, each vertex has a normal
     for (int i = 0; i < 3; i++) {
-      normals[0].push_back(m_face->m_normal);
+      normals[0].push_back(face.m_normal);
     }
   }
   actor->m_renderComponent->SetNormals(normals);
