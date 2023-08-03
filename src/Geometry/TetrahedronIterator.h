@@ -29,7 +29,7 @@ public:
   void  Advance();
   bool  Done();
   Edge& Current();
-
+  int   Idx() const { return m_idx; }
 
 private:
   int              m_idx;
@@ -42,7 +42,7 @@ public:
   void  Advance();
   bool  Done();
   Face& Current();
-
+  int   Idx() const { return m_idx; }
 
 private:
   int              m_idx;
@@ -55,7 +55,7 @@ public:
   void Advance();
   bool Done();
   Tet& Current();
-
+  int  Idx() const { return m_idx; }
 
 private:
   int              m_idx;

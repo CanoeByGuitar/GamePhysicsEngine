@@ -7,6 +7,7 @@
 
 
 #include "TetrahedronMesh.h"
+#include <poly2tri.h>
 
 namespace SimpleComplex {
 class TetBoolean {
@@ -32,6 +33,8 @@ public:
 
   TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
 
+  static void Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
+                   std::vector<std::vector<int>>& faceSteiner);
 
 private:
   TetBoolean();
@@ -40,8 +43,14 @@ private:
   //  1: out
   //  2: on
   //  -1: else
+  // TODO: initialize with -1
   std::vector<int> m_vertexFlagA;
   std::vector<int> m_vertexFlagB;
+
+  std::vector<std::vector<int>> m_faceSteinerA;
+  std::vector<std::vector<int>> m_faceSteinerB;
+
+
 
 };
 }   // namespace SimpleComplex

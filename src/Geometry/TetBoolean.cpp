@@ -6,7 +6,7 @@
 #include "TetrahedronIterator.h"
 #include <set>
 
-
+using p2t::CDT;
 SimpleComplex::TetrahedronMesh SimpleComplex::TetBoolean::Union(
   const SimpleComplex::TetrahedronMesh& lhs, const SimpleComplex::TetrahedronMesh& rhs) {}
 
@@ -58,25 +58,26 @@ void SimpleComplex::TetBoolean::GetIntersectionLine(SimpleComplex::TetrahedronMe
   // (4) update tet data structure
   for (FaceIterator faceIterA(A); !faceIterA.Done(); faceIterA.Advance()) {
     for (FaceIterator faceIterB(B); !faceIterB.Done(); faceIterB.Advance()) {
-      Face                      T1 = faceIterA.Current();
-      Face                      T2 = faceIterB.Current();
+      Face T1 = faceIterA.Current();
+      Face T2 = faceIterB.Current();
 
-      vec3 pA0 = A.m_vertices[T1.m_verts[0]].ToVec3();
-      vec3 pA1 = A.m_vertices[T1.m_verts[1]].ToVec3();
-      vec3 pA2 = A.m_vertices[T1.m_verts[2]].ToVec3();
-      vec3 pB0 = B.m_vertices[T2.m_verts[0]].ToVec3();
-      vec3 pB1 = B.m_vertices[T2.m_verts[1]].ToVec3();
-      vec3 pB2 = B.m_vertices[T2.m_verts[2]].ToVec3();
+      vec3                      pA0 = A.m_vertices[T1.m_verts[0]].ToVec3();
+      vec3                      pA1 = A.m_vertices[T1.m_verts[1]].ToVec3();
+      vec3                      pA2 = A.m_vertices[T1.m_verts[2]].ToVec3();
+      vec3                      pB0 = B.m_vertices[T2.m_verts[0]].ToVec3();
+      vec3                      pB1 = B.m_vertices[T2.m_verts[1]].ToVec3();
+      vec3                      pB2 = B.m_vertices[T2.m_verts[2]].ToVec3();
       std::vector<Intersection> inters;   // should be 2 or 0
       for (EdgeIterator edgeIter(A); !edgeIter.Done(); edgeIter.Advance()) {
         auto edge  = edgeIter.Current();
         vec3 o     = A.m_vertices[edge.m_verts[0]].ToVec3();
         vec3 end   = A.m_vertices[edge.m_verts[1]].ToVec3();
         auto inter = GetIntersection(o, end, pB0, pB1, pB2);
-        if (inter.m_isHit){
+        if (inter.m_isHit) {
           inters.push_back(inter);
+          int idx = B.AddVertex(inter.m_hitPoint);
+          m_faceSteinerB[faceIterB.Idx()].push_back(idx);
         }
-
       }
 
       for (EdgeIterator edgeIter(B); !edgeIter.Done(); edgeIter.Advance()) {
@@ -84,34 +85,128 @@ void SimpleComplex::TetBoolean::GetIntersectionLine(SimpleComplex::TetrahedronMe
         vec3 o     = B.m_vertices[edge.m_verts[0]].ToVec3();
         vec3 end   = B.m_vertices[edge.m_verts[1]].ToVec3();
         auto inter = GetIntersection(o, end, pA0, pA1, pA2);
-        if (inter.m_isHit)
+        if (inter.m_isHit){
           inters.push_back(inter);
+          int idx = A.AddVertex(inter.m_hitPoint);
+          m_faceSteinerA[faceIterA.Idx()].push_back(idx);
+        }
       }
 
-      if (inters.empty())
-        continue;
-      else {
-        int a0 = A.AddVertex(inters[0].m_hitPoint);
-        int a1 = A.AddVertex(inters[1].m_hitPoint);
-        int b0 = B.AddVertex(inters[0].m_hitPoint);
-        int b1 = B.AddVertex(inters[1].m_hitPoint);
-        m_vertexFlagA[a0] = 2;
-        m_vertexFlagA[a1] = 2;
-        m_vertexFlagB[b0] = 2;
-        m_vertexFlagB[b1] = 2;
-        A.AddEdge(a0, a1);
-        B.AddEdge(b0, b1);
 
-        // classify 6 points flag of 2 triangles
-
-
-        // re-triangulated
-
+      // classify 6 points flag of 2 triangles
+      // verts of A to B
+      for(int vert : T1.m_verts){
+        auto normal = T2.m_normal;
+        auto f_x = B.m_vertices[T2.m_verts[0]].ToVec3();
+        auto v_x = A.m_vertices[vert].ToVec3();
+        auto temp = glm::dot(f_x - v_x, normal);
+        if(temp < 0){
+          m_vertexFlagA[vert] = 0;
+        }else if(temp == 0){
+          m_vertexFlagA[vert] = 2;
+        }else{
+          if(!inters.empty()){
+            m_vertexFlagA[vert] = 1;
+          }
+        }
+      }
+      // verts of B to A
+      for(int vert : T2.m_verts){
+        auto normal = T1.m_normal;
+        auto f_x = A.m_vertices[T1.m_verts[0]].ToVec3();
+        auto v_x = B.m_vertices[vert].ToVec3();
+        auto temp = glm::dot(f_x - v_x, normal);
+        if(temp < 0){
+          m_vertexFlagB[vert] = 0;
+        }else if(temp == 0){
+          m_vertexFlagB[vert] = 2;
+        }else{
+          if(!inters.empty()){
+            m_vertexFlagB[vert] = 1;
+          }
+        }
       }
     }
   }
+
+  // re-triangulated
+  Triangulate(A, m_faceSteinerA);
+  Triangulate(B, m_faceSteinerB);
+
 }
 
+
+void SimpleComplex::TetBoolean::Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
+                                            std::vector<std::vector<int>>& faceSteiner) {
+  for(FaceIterator it(tetMesh); it.Done(); it.Advance()){
+    if(faceSteiner[it.Idx()].empty()) continue;
+
+    auto p0 = tetMesh.m_vertices[it.Current().m_verts[0]].ToVec3();
+    auto p1 = tetMesh.m_vertices[it.Current().m_verts[1]].ToVec3();
+    auto p2 = tetMesh.m_vertices[it.Current().m_verts[2]].ToVec3();
+    p2t::Point *a, *b, *c;
+    int projectType = 0;
+    if(p0.x == p1.x && p0.x == p2.x){
+      // project to yoz
+
+    }else if(p0.z == p1.z && p0.z == p2.z){
+      // project to xoy
+      projectType = 1;
+    }else{
+      // project to xoz
+      projectType = 2;
+    }
+
+    std::unordered_map<p2t::Point*, int> mp;
+    if(projectType == 0){
+      a  = new p2t::Point{p0.y, p0.z};
+      b = new p2t::Point{p1.y, p1.z};
+      c = new p2t::Point{p2.y, p2.z};
+    }else if(projectType == 1){
+      a  = new p2t::Point{p0.x, p0.y};
+      b = new p2t::Point{p1.x, p1.y};
+      c = new p2t::Point{p2.x, p2.y};
+    }else{
+      a  = new p2t::Point{p0.x, p0.z};
+      b = new p2t::Point{p1.x, p1.z};
+      c = new p2t::Point{p2.x, p2.z};
+    }
+    mp[a] = it.Current().m_verts[0];
+    mp[b] = it.Current().m_verts[1];
+    mp[c] = it.Current().m_verts[2];
+
+    std::vector<p2t::Point*> polyline{a, b, c};
+    std::vector<p2t::Point*> steiner;
+
+    for(auto pointId : faceSteiner[it.Idx()]){
+      auto pos = tetMesh.m_vertices[pointId].ToVec3();
+      if(projectType == 0){
+        steiner.push_back(new p2t::Point(pos.y, pos.z));
+      }else if(projectType == 1){
+        steiner.push_back(new p2t::Point(pos.x, pos.y));
+      }else{
+        steiner.push_back(new p2t::Point(pos.x, pos.z));
+      }
+    }
+
+    CDT* cdt = new CDT(polyline);
+    for(auto s : steiner){
+      cdt->AddPoint(s);
+    }
+    cdt->Triangulate();
+    std::vector<p2t::Triangle*> triangles = cdt->GetTriangles();
+    for(auto tri : triangles){
+      p2t::Point* pa = tri->GetPoint(0);
+      p2t::Point* pb = tri->GetPoint(1);
+      p2t::Point* pc = tri->GetPoint(2);
+      int e0 = tetMesh.AddEdge(mp[pa], mp[pb]);
+      int e1 = tetMesh.AddEdge(mp[pb], mp[pc]);
+      int e2 = tetMesh.AddEdge(mp[pc], mp[pa]);
+
+      int f0 = tetMesh.AddFace(e0, e1, e2);
+    }
+  }
+}
 
 SimpleComplex::TetrahedronMesh SimpleComplex::TetBoolean::GetTetMesh(
   const SimpleComplex::TetBoolean::TwoVecInt& twoVecInt) {
