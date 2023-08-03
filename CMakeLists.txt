@@ -14,7 +14,10 @@ include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
 #include_directories(${PROJECT_SOURCE_DIR}/external/glfw/include/GLFW)
 #endif ()
 include_directories(${PROJECT_SOURCE_DIR}/external/imgui)
+include_directories(${PROJECT_SOURCE_DIR}/external/poly2tri)
 include_directories(${PROJECT_SOURCE_DIR}/src)
+
+
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -24,6 +27,7 @@ add_subdirectory(external/glm)
 #add_subdirectory(external/glfw)
 #endif()
 add_subdirectory(external/imgui)
+add_subdirectory(external/poly2tri)
 add_subdirectory(src/Math)
 add_subdirectory(src/Base)
 add_subdirectory(src/Loader)

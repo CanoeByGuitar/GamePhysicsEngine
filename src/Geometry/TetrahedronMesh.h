@@ -75,7 +75,7 @@ public:
   int  AddFace(int a, int b, int c);
   int  AddTet(int a, int b, int c, int d);
 
-  int AddVertex(const vec3& v);
+  int                 AddVertex(const vec3& v);
   std::vector<Vertex> m_vertices;
   std::vector<Edge>   m_edges;
   std::vector<Face>   m_faces;
@@ -91,6 +91,19 @@ public:
   //  std::vector<std::vector<int>> m_EE;   // edge to same edge
   //  std::vector<std::vector<int>> m_FF;   // face to same face
 };
+
+
+struct Intersection {
+  bool m_isHit;
+  vec3 m_hitPoint;
+  Intersection():m_isHit(false){};
+};
+
+Intersection GetIntersection(const vec3& o,
+                             const vec3& end,
+                             const vec3& p0,
+                             const vec3& p1,
+                             const vec3& p2);
 
 }   // namespace SimpleComplex
 

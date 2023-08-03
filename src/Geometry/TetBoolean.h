@@ -20,16 +20,15 @@ public:
   }
 
   TetrahedronMesh Union(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
-  TetrahedronMesh Intersection(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
+  TetrahedronMesh Intersect(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
   TetrahedronMesh Difference(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
 
   using TwoVecInt = std::pair<std::vector<int>, std::vector<int>>;
 
-  TwoVecInt AInB(TetrahedronMesh& A, TetrahedronMesh& B);
-  TetrahedronMesh AOutB(const TetrahedronMesh& A, const TetrahedronMesh& B);
+  TwoVecInt       AInB(TetrahedronMesh& A, TetrahedronMesh& B);
+  TetrahedronMesh AOutB(TetrahedronMesh& A, TetrahedronMesh& B);
 
-  void GetIntersectionLine(const SimpleComplex::TetrahedronMesh& A,
-                           const SimpleComplex::TetrahedronMesh& B);
+  void GetIntersectionLine(SimpleComplex::TetrahedronMesh& A, SimpleComplex::TetrahedronMesh& B);
 
   TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
 
@@ -41,10 +40,8 @@ private:
   //  1: out
   //  2: on
   //  -1: else
-  std::vector<int> m_vertexFlag;
-
-  std::vector<int> m_vertexOnIntersection;
-
+  std::vector<int> m_vertexFlagA;
+  std::vector<int> m_vertexFlagB;
 
 };
 }   // namespace SimpleComplex

@@ -7,4 +7,4 @@ file(GLOB GEO_SOURCE
         )
 
 add_library(Geometry SHARED ${GEO_HEADER} ${GEO_SOURCE})
-target_link_libraries(Geometry PUBLIC Base)
+target_link_libraries(Geometry PUBLIC Base poly2tri)

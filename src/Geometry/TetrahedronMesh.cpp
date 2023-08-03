@@ -129,6 +129,7 @@ int SimpleComplex::TetrahedronMesh::AddFace(int a, int b, int c) {
     f.m_normal = glm::cross(m_vertices[b].ToVec3() - m_vertices[a].ToVec3(),
                             m_vertices[c].ToVec3() - m_vertices[b].ToVec3());
     m_faces.push_back(f);
+    return face_cnt;
   } else {
     return m_faceMap[f];
   }
@@ -159,4 +160,32 @@ int SimpleComplex::TetrahedronMesh::AddVertex(const vec3& v) {
   int vertex_cnt = (int)m_vertices.size();
   m_vertices.emplace_back(vertex_cnt, v.x, v.y, v.z);
   return vertex_cnt;
+}
+
+SimpleComplex::Intersection SimpleComplex::GetIntersection(const vec3& o,
+                                                           const vec3& end,
+                                                           const vec3& p0,
+                                                           const vec3& p1,
+                                                           const vec3& p2) {
+
+  auto d = glm::normalize(end - o);
+  auto e1 = p1 - p0;
+  auto e2 = p2 - p0;
+  auto s  = o - p0;
+  auto s1 = glm::cross(d, e2);
+  auto s2 = glm::cross(s, e1);
+
+  auto  s1e1 = glm::dot(s1, e1);
+  float t    = glm::dot(s2, e2) / s1e1;
+  float b1   = glm::dot(s1, s) / s1e1;
+  float b2   = glm::dot(s2, d) / s1e1;
+
+  bool inEdge = false;
+  if (t < glm::distance(o, end))  inEdge = true;
+  Intersection inter;
+  if (inEdge && b1 > 0 && b1 < 1 && b2 > 0 && b2 < 1 && b1 + b2 < 1){
+    inter.m_isHit = true;
+    inter.m_hitPoint = o + t * d;
+  }
+  return inter;
 }

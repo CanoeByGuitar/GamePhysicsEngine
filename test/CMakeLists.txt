@@ -44,3 +44,6 @@ target_link_libraries(ConvexHull Engine)
 
 add_executable(TetrahedronTest TetrahedronTest.cpp)
 target_link_libraries(TetrahedronTest Engine)
+
+add_executable(poly2triTest Poly2TriTest.cpp)
+target_link_libraries(poly2triTest Engine)
