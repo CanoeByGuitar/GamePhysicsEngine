@@ -148,7 +148,7 @@ int SimpleComplex::TetrahedronMesh::AddTet(int a, int b, int c, int d) {
   auto f0 = AddFace(a, b, c);
   auto f1 = AddFace(a, c, d);
   auto f2 = AddFace(a, d, b);
-  auto f3 = AddFace(b, b, c);
+  auto f3 = AddFace(b, d, c);
 
   // add tet
   int tet_cnt = static_cast<int>(m_tets.size());
@@ -159,6 +159,11 @@ int SimpleComplex::TetrahedronMesh::AddTet(int a, int b, int c, int d) {
 int SimpleComplex::TetrahedronMesh::AddVertex(const vec3& v) {
   int vertex_cnt = (int)m_vertices.size();
   m_vertices.emplace_back(vertex_cnt, v.x, v.y, v.z);
+
+  // enlarge m_VV and m_VF
+  // todo: accelerate
+  m_VV.resize(m_VV.size() + 1);
+  m_VF.resize(m_VF.size() + 1);
   return vertex_cnt;
 }
 
@@ -181,7 +186,13 @@ SimpleComplex::Intersection SimpleComplex::GetIntersection(const vec3& o,
   float b2   = glm::dot(s2, d) / s1e1;
 
   bool inEdge = false;
-  if (t < glm::distance(o, end))  inEdge = true;
+//  if (t <= glm::distance(o, end))  inEdge = true;
+//  Intersection inter;
+//  if (inEdge && b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b1 + b2 <= 1){
+//    inter.m_isHit = true;
+//    inter.m_hitPoint = o + t * d;
+//  }
+  if (t <= glm::distance(o, end))  inEdge = true;
   Intersection inter;
   if (inEdge && b1 > 0 && b1 < 1 && b2 > 0 && b2 < 1 && b1 + b2 < 1){
     inter.m_isHit = true;

@@ -9,49 +9,68 @@
 #include "TetrahedronMesh.h"
 #include <poly2tri.h>
 
+#include <utility>
+#include <Base/DataStructure.h>
+
 namespace SimpleComplex {
+struct BooleanTet {
+  TetrahedronMesh* m_tetMesh;
+  std::vector<int> m_vertexFlag;
+  //  0: in
+  //  1: out
+  //  2: on
+  //  -1: else
+
+  std::vector<std::vector<int>> m_faceSteiner;
+
+  // for each face: {vec3 ==> vertex ID}
+  std::vector<std::unordered_map<vec3, int, Vec3Hash>> m_faceSteinerHash;
+
+  explicit BooleanTet(TetrahedronMesh* tet)
+    : m_tetMesh(tet) {
+    m_vertexFlag  = std::vector<int>(m_tetMesh->m_vertices.size(), -1);
+    m_faceSteiner = std::vector<std::vector<int>>(m_tetMesh->m_faces.size());
+    m_faceSteinerHash = std::vector<std::unordered_map<vec3, int, Vec3Hash>>(m_tetMesh->m_faces.size());
+  }
+
+  BooleanTet(BooleanTet&& other) noexcept
+    : m_tetMesh(other.m_tetMesh)
+    , m_vertexFlag(std::move(other.m_vertexFlag))
+    , m_faceSteiner(std::move(other.m_faceSteiner))
+    , m_faceSteinerHash(std::move(other.m_faceSteinerHash)) {
+    other.m_tetMesh = nullptr;
+  }
+};
+
 class TetBoolean {
 public:
   TetBoolean(const TetBoolean&)            = delete;
   TetBoolean& operator=(const TetBoolean&) = delete;
 
-  static TetBoolean& GetInstance() {
-    static TetBoolean instance;
+  static TetBoolean& GetInstance(TetrahedronMesh* A, TetrahedronMesh* B) {
+    static TetBoolean instance(A, B);
     return instance;
   }
 
-  TetrahedronMesh Union(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
-  TetrahedronMesh Intersect(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
-  TetrahedronMesh Difference(const TetrahedronMesh& lhs, const TetrahedronMesh& rhs);
+  TetrahedronMesh Union();
+  TetrahedronMesh Intersect();
+  TetrahedronMesh Difference();
 
   using TwoVecInt = std::pair<std::vector<int>, std::vector<int>>;
 
-  TwoVecInt       AInB(TetrahedronMesh& A, TetrahedronMesh& B);
-  TetrahedronMesh AOutB(TetrahedronMesh& A, TetrahedronMesh& B);
+  TwoVecInt       AInB();
+  TetrahedronMesh AOutB();
 
-  void GetIntersectionLine(SimpleComplex::TetrahedronMesh& A, SimpleComplex::TetrahedronMesh& B);
+  void GetIntersectionLine();
 
   TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
 
   static void Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
-                   std::vector<std::vector<int>>& faceSteiner);
+                          std::vector<std::vector<int>>&  faceSteiner);
 
 private:
-  TetBoolean();
-
-  //  0: in
-  //  1: out
-  //  2: on
-  //  -1: else
-  // TODO: initialize with -1
-  std::vector<int> m_vertexFlagA;
-  std::vector<int> m_vertexFlagB;
-
-  std::vector<std::vector<int>> m_faceSteinerA;
-  std::vector<std::vector<int>> m_faceSteinerB;
-
-
-
+  TetBoolean(TetrahedronMesh* A, TetrahedronMesh* B);
+  BooleanTet m_A, m_B;
 };
 }   // namespace SimpleComplex
 

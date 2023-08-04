@@ -47,3 +47,6 @@ target_link_libraries(TetrahedronTest Engine)
 
 add_executable(poly2triTest Poly2TriTest.cpp)
 target_link_libraries(poly2triTest Engine)
+
+add_executable(TetInter TetIntersectTest.cpp)
+target_link_libraries(TetInter Engine)
