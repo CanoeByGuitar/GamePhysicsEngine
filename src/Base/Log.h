@@ -13,6 +13,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <glm/gtc/epsilon.hpp>
 
 #define TICK(x) auto bench_##x = std::chrono::system_clock::now();
 #define TOCK(x) spdlog::info("-------{}: {:.1f}ms", #x, std::chrono::duration<double, std::milli>(std::chrono::system_clock::now() - bench_##x).count());

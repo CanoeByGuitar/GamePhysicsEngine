@@ -5,6 +5,7 @@
 #include "TetrahedronMesh.h"
 #include "unordered_map"
 #include <algorithm>
+#include <glm/gtc/epsilon.hpp>
 
 SimpleComplex::Vertex::Vertex(int idx, float x, float y, float z)
   : m_idx(idx)
@@ -167,13 +168,11 @@ int SimpleComplex::TetrahedronMesh::AddVertex(const vec3& v) {
   return vertex_cnt;
 }
 
-SimpleComplex::Intersection SimpleComplex::GetIntersection(const vec3& o,
-                                                           const vec3& end,
-                                                           const vec3& p0,
-                                                           const vec3& p1,
+SimpleComplex::Intersection SimpleComplex::GetIntersection(const vec3& o, const vec3& end,
+                                                           const vec3& p0, const vec3& p1,
                                                            const vec3& p2) {
 
-  auto d = glm::normalize(end - o);
+  auto d  = glm::normalize(end - o);
   auto e1 = p1 - p0;
   auto e2 = p2 - p0;
   auto s  = o - p0;
@@ -186,17 +185,26 @@ SimpleComplex::Intersection SimpleComplex::GetIntersection(const vec3& o,
   float b2   = glm::dot(s2, d) / s1e1;
 
   bool inEdge = false;
-//  if (t <= glm::distance(o, end))  inEdge = true;
-//  Intersection inter;
-//  if (inEdge && b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b1 + b2 <= 1){
-//    inter.m_isHit = true;
-//    inter.m_hitPoint = o + t * d;
-//  }
-  if (t <= glm::distance(o, end))  inEdge = true;
+  if (t <= glm::distance(o, end))
+    inEdge = true;
   Intersection inter;
-  if (inEdge && b1 > 0 && b1 < 1 && b2 > 0 && b2 < 1 && b1 + b2 < 1){
-    inter.m_isHit = true;
+  if (inEdge && b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b1 + b2 <= 1) {
+    inter.m_isHit    = true;
     inter.m_hitPoint = o + t * d;
   }
+
+  float epsilon = 1e-3;
+  if (glm::all(glm::epsilonEqual(inter.m_hitPoint, p0, epsilon)) ||
+      glm::all(glm::epsilonEqual(inter.m_hitPoint, p1, epsilon)) ||
+      glm::all(glm::epsilonEqual(inter.m_hitPoint, p2, epsilon))) {
+    inter.m_isHit = false;
+    inter.m_hitPoint = vec3{0};
+  }
+  //  if (t <= glm::distance(o, end))  inEdge = true;
+  //  Intersection inter;
+  //  if (inEdge && b1 > 0 && b1 < 1 && b2 > 0 && b2 < 1 && b1 + b2 < 1){
+  //    inter.m_isHit = true;
+  //    inter.m_hitPoint = o + t * d;
+  //  }
   return inter;
 }

@@ -26,6 +26,8 @@ struct BooleanTet {
   // for each face: {vec3 ==> vertex ID}
   std::vector<std::unordered_map<vec3, int, Vec3Hash>> m_faceSteinerHash;
 
+  int m_originFaceNum;
+
   explicit BooleanTet(TetrahedronMesh* tet)
     : m_tetMesh(tet) {
     m_vertexFlag  = std::vector<int>(m_tetMesh->m_vertices.size(), -1);
@@ -66,7 +68,8 @@ public:
   TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
 
   static void Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
-                          std::vector<std::vector<int>>&  faceSteiner);
+                          std::vector<std::vector<int>>&  faceSteiner,
+                          int originFaceNum);
 
 private:
   TetBoolean(TetrahedronMesh* A, TetrahedronMesh* B);

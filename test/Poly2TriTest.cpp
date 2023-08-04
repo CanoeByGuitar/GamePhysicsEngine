@@ -73,11 +73,14 @@ int main(){
      new p2t::Point{-0.5, 1},
      new p2t::Point{0, 0}};
 
+//  vector<p2t::Point*> steiner =
+//    {
+//      new p2t::Point{0.5, 1},
+//      new p2t::Point{-0.5, 1},
+//      new p2t::Point{0, 0}};
+
   vector<p2t::Point*> steiner =
-    {
-      new p2t::Point{0.5, 1},
-      new p2t::Point{-0.5, 1},
-      new p2t::Point{0, 0}};
+    {new p2t::Point{0, 4}};
 
   CDT* cdt = new CDT(polyline);
 //  cdt->AddHole(hole);

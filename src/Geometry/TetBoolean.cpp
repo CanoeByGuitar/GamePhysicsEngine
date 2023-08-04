@@ -11,7 +11,10 @@ using p2t::CDT;
 namespace SimpleComplex {
 TetBoolean::TetBoolean(TetrahedronMesh* A, TetrahedronMesh* B)
   : m_A(std::move(BooleanTet(A)))
-  , m_B(std::move(BooleanTet(B))) {}
+  , m_B(std::move(BooleanTet(B))) {
+  m_A.m_originFaceNum = (int)m_A.m_tetMesh->m_faces.size();
+  m_B.m_originFaceNum = (int)m_B.m_tetMesh->m_faces.size();
+}
 
 void TetBoolean::GetIntersectionLine() {
   // this will change the topology of A and B
@@ -113,8 +116,8 @@ void TetBoolean::GetIntersectionLine() {
   }
 
   // re-triangulated
-  Triangulate(*A, steinerA);
-  Triangulate(*B, steinerB);
+  Triangulate(*A, steinerA, m_A.m_originFaceNum);
+  Triangulate(*B, steinerB, m_B.m_originFaceNum);
 }
 
 
@@ -152,8 +155,9 @@ TetBoolean::TwoVecInt SimpleComplex::TetBoolean::AInB() {
 }
 
 void TetBoolean::Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
-                             std::vector<std::vector<int>>&  faceSteiner) {
-  for (FaceIterator it(tetMesh); !it.Done(); it.Advance()) {
+                             std::vector<std::vector<int>>&  faceSteiner,
+                             int originFaceNum) {
+  for (FaceIterator it(tetMesh); !it.Done() && it.Idx() < originFaceNum; it.Advance()) {
     if (faceSteiner[it.Idx()].empty())
       continue;
 
