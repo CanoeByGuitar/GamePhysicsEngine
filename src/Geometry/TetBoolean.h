@@ -61,9 +61,12 @@ public:
   using TwoVecInt = std::pair<std::vector<int>, std::vector<int>>;
 
   TwoVecInt       AInB();
+  TwoVecInt MyAInB();
   TetrahedronMesh AOutB();
 
   void GetIntersectionLine();
+
+  std::vector<vec3> GetIntersectionLineVertices();
 
   TetrahedronMesh GetTetMesh(const TwoVecInt& twoVecInt);
 
@@ -71,6 +74,10 @@ public:
                           std::vector<std::vector<int>>&  faceSteiner,
                           int originFaceNum);
 
+  GeoMeshPtr ToGeoMeshAinB(const std::vector<int>&);
+
+public:
+  std::vector<vec3> m_intersectionLine;
 private:
   TetBoolean(TetrahedronMesh* A, TetrahedronMesh* B);
   BooleanTet m_A, m_B;

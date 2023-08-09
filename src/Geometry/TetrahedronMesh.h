@@ -81,8 +81,8 @@ public:
   std::vector<Face>   m_faces;
   std::vector<Tet>    m_tets;
 
-  std::vector<std::vector<int>> m_VF;   // vertex to face
-  std::vector<std::vector<int>> m_VV;   // vertex to different vertex
+  std::vector<std::vector<int>> m_VF;   // vertex to incident face
+  std::vector<std::vector<int>> m_VV;   // vertex to incident vertex
 
 
   std::unordered_map<Edge, int, EdgeHash> m_edgeMap;   // used to deduplicate

@@ -8,9 +8,9 @@
 
 #include "Engine.h"
 #include <Actor.h>
+#include <Geometry/TetBoolean.h>
 #include <Geometry/TetrahedronMesh.h>
 #include <Loader/TetLoader.h>
-#include <Geometry/TetBoolean.h>
 
 class MyGui : public GuiSystem {
 public:
@@ -60,58 +60,387 @@ public:
 
 int main() {
   PHY_LEVEL_DEBUG;
-  auto tet1 =
-    TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet.txt");
-  auto tet2 =
-    TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet2.txt");
 
-  SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLine();
+  int test_case = 0;
 
-  auto geoMesh1 = tet1->ToGeoMesh();
-  auto model1   = std::make_shared<geo::Model>();
-  model1->m_meshes.push_back(*geoMesh1);
-  std::vector<Actor*> world;
-  auto actor1= new ModelActor(model1, "test");
-  actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
-  actor1->SetRenderColor({0.7, 0.2, 0});
-  /// normal
-  std::vector<std::vector<vec3>> normals(1);
-  for (const auto& face : tet1->m_faces) {
-    // each triangle has 3 vertices, each vertex has a normal
-    for (int i = 0; i < 3; i++) {
-      normals[0].push_back(face.m_normal);
+  // parallel face case
+  if (test_case == 0) {
+    std::vector<Actor*> world;
+
+    auto tet1 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet.txt");
+    auto tet2 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet2.txt");
+
+    SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLine();
+    auto lineVertices =
+      SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLineVertices();
+
+    auto line =  SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).m_intersectionLine;
+    Actor* line_actor = new ParticlesActor(
+      std::make_shared<geo::Particles3D>(line),
+      "test");
+    line_actor->InitRenderObject(renderer::STATIC, renderer::EDGE);
+    line_actor->SetRenderColor({1, 1, 0});
+    world.push_back(line_actor);
+
+
+    Actor* particle_actor = new ParticlesActor(
+      std::make_shared<geo::Particles3D>(lineVertices),
+      "test");
+    particle_actor->InitRenderObject(renderer::STATIC, renderer::TRIANGLE);
+    particle_actor->SetRenderColor({1, 1, 0});
+    world.push_back(particle_actor);
+
+
+    auto geoMesh1 = tet1->ToGeoMesh();
+    auto model1   = std::make_shared<geo::Model>();
+    model1->m_meshes.push_back(*geoMesh1);
+
+    auto                actor1 = new ModelActor(model1, "test");
+    actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+    actor1->SetRenderColor({0.7, 0.2, 0});
+    /// normal
+    std::vector<std::vector<vec3>> normals(1);
+    for (const auto& face : tet1->m_faces) {
+      // each triangle has 3 vertices, each vertex has a normal
+      for (int i = 0; i < 3; i++) {
+        normals[0].push_back(face.m_normal);
+      }
     }
-  }
-  actor1->m_renderComponent->SetNormals(normals);
+    actor1->m_renderComponent->SetNormals(normals);
 
 
 
 
 
-  auto geoMesh2 = tet2->ToGeoMesh();
-  auto model2   = std::make_shared<geo::Model>();
-  model2->m_meshes.push_back(*geoMesh2);
-  auto actor2= new ModelActor(model2, "test");
-  actor2->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
-  actor2->SetRenderColor({0, 0.2, 0.6});
-  /// normal
-  normals[0].clear();
-  for (const auto& face : tet2->m_faces) {
-    // each triangle has 3 vertices, each vertex has a normal
-    for (int i = 0; i < 3; i++) {
-      normals[0].push_back(face.m_normal);
+    auto geoMesh2 = tet2->ToGeoMesh();
+    auto model2   = std::make_shared<geo::Model>();
+    model2->m_meshes.push_back(*geoMesh2);
+    auto actor2 = new ModelActor(model2, "test");
+    actor2->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+    actor2->SetRenderColor({0, 0.2, 0.6});
+    /// normal
+    normals[0].clear();
+    for (const auto& face : tet2->m_faces) {
+      // each triangle has 3 vertices, each vertex has a normal
+      for (int i = 0; i < 3; i++) {
+        normals[0].push_back(face.m_normal);
+      }
     }
+    actor2->m_renderComponent->SetNormals(normals);
+
+    world.push_back(actor1);
+    world.push_back(actor2);
+
+
+
+
+    auto   gui = new MyGui;
+    Engine engine(world, gui);
+    engine.Init();
+    engine.Execute();
   }
-  actor2->m_renderComponent->SetNormals(normals);
 
-  world.push_back(actor1);
-  world.push_back(actor2);
+  if (test_case == 1) {
+    auto tet1 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet2.txt");
+    auto tet2 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet.txt");
+
+    auto [_x, _newMesh] = SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).AInB();
+    auto geoMesh1 =
+      SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).ToGeoMeshAinB(_newMesh);
+
+    auto model1 = std::make_shared<geo::Model>();
+    model1->m_meshes.push_back(*geoMesh1);
+    std::vector<Actor*> world;
+    auto                actor1 = new ModelActor(model1, "test");
+    actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+    actor1->SetRenderColor({0.7, 0.2, 0});
+    /// normal
+    std::vector<std::vector<vec3>> normals(1);
+    for (const auto& face : tet1->m_faces) {
+      // each triangle has 3 vertices, each vertex has a normal
+      for (int i = 0; i < 3; i++) {
+        normals[0].push_back(face.m_normal);
+      }
+    }
+    actor1->m_renderComponent->SetNormals(normals);
+
+    world.push_back(actor1);
+
+    auto   gui = new MyGui;
+    Engine engine(world, gui);
+    engine.Init();
+    engine.Execute();
+  }
+
+  // show line
+  if (test_case == 2) {
+    std::vector<Actor*> world;
+
+    auto tet1 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet.txt");
+    auto tet2 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/tet3.txt");
+
+    SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLine();
+    auto lineVertices =
+      SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLineVertices();
+
+    auto line =  SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).m_intersectionLine;
+    Actor* line_actor = new ParticlesActor(
+      std::make_shared<geo::Particles3D>(line),
+      "test");
+    line_actor->InitRenderObject(renderer::STATIC, renderer::EDGE);
+    line_actor->SetRenderColor({1, 1, 0});
+    world.push_back(line_actor);
+
+
+    Actor* particle_actor = new ParticlesActor(
+      std::make_shared<geo::Particles3D>(lineVertices),
+      "test");
+    particle_actor->InitRenderObject(renderer::STATIC, renderer::TRIANGLE);
+    particle_actor->SetRenderColor({1, 1, 0});
+    world.push_back(particle_actor);
+
+
+    auto geoMesh1 = tet1->ToGeoMesh();
+    auto model1   = std::make_shared<geo::Model>();
+    model1->m_meshes.push_back(*geoMesh1);
+
+    auto                actor1 = new ModelActor(model1, "test");
+    actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+    actor1->SetRenderColor({0.7, 0.2, 0});
+    /// normal
+    std::vector<std::vector<vec3>> normals(1);
+    for (const auto& face : tet1->m_faces) {
+      // each triangle has 3 vertices, each vertex has a normal
+      for (int i = 0; i < 3; i++) {
+        normals[0].push_back(face.m_normal);
+      }
+    }
+    actor1->m_renderComponent->SetNormals(normals);
 
 
 
 
-  auto   gui = new MyGui;
-  Engine engine(world, gui);
-  engine.Init();
-  engine.Execute();
+
+    auto geoMesh2 = tet2->ToGeoMesh();
+    auto model2   = std::make_shared<geo::Model>();
+    model2->m_meshes.push_back(*geoMesh2);
+    auto actor2 = new ModelActor(model2, "test");
+    actor2->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+    actor2->SetRenderColor({0, 0.2, 0.6});
+    /// normal
+    normals[0].clear();
+    for (const auto& face : tet2->m_faces) {
+      // each triangle has 3 vertices, each vertex has a normal
+      for (int i = 0; i < 3; i++) {
+        normals[0].push_back(face.m_normal);
+      }
+    }
+    actor2->m_renderComponent->SetNormals(normals);
+
+    world.push_back(actor1);
+    world.push_back(actor2);
+
+
+
+
+    auto   gui = new MyGui;
+    Engine engine(world, gui);
+    engine.Init();
+    engine.Execute();
+  }
+
+  // bunny case
+  if (test_case == 3) {
+    std::vector<Actor*> world;
+
+    auto tet1 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/bunny_low.mesh",
+                      false);
+    auto tet2 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/bunny_low.mesh",
+                      false,
+                      {0.05, 0.05, 0.05});
+
+    {
+      SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLine();
+      auto lineVertices =
+        SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLineVertices();
+
+      auto line =  SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).m_intersectionLine;
+      Actor* line_actor = new ParticlesActor(
+        std::make_shared<geo::Particles3D>(line),
+        "test");
+      line_actor->InitRenderObject(renderer::STATIC, renderer::EDGE);
+      line_actor->SetRenderColor({1, 1, 0});
+      world.push_back(line_actor);
+
+
+      Actor* particle_actor = new ParticlesActor(
+        std::make_shared<geo::Particles3D>(lineVertices),
+        "test");
+      particle_actor->InitRenderObject(renderer::STATIC, renderer::TRIANGLE);
+      particle_actor->SetRenderColor({1, 1, 0});
+      world.push_back(particle_actor);
+    }
+
+
+
+    {
+      auto geoMesh1 = tet1->ToGeoMesh();
+      auto model1   = std::make_shared<geo::Model>();
+      model1->m_meshes.push_back(*geoMesh1);
+
+      auto                actor1 = new ModelActor(model1, "test");
+      actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+      actor1->SetRenderColor({0.7, 0.2, 0});
+      /// normal
+      std::vector<std::vector<vec3>> normals(1);
+      for (const auto& face : tet1->m_faces) {
+        // each triangle has 3 vertices, each vertex has a normal
+        for (int i = 0; i < 3; i++) {
+          normals[0].push_back(face.m_normal);
+        }
+      }
+      actor1->m_renderComponent->SetNormals(normals);
+      world.push_back(actor1);
+    }
+
+
+
+
+
+    {
+      auto geoMesh2 = tet2->ToGeoMesh();
+      auto model2   = std::make_shared<geo::Model>();
+      model2->m_meshes.push_back(*geoMesh2);
+      auto actor2 = new ModelActor(model2, "test");
+      actor2->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+      actor2->SetRenderColor({0, 0.2, 0.6});
+      /// normal
+      std::vector<std::vector<vec3>> normals(1);
+      normals[0].clear();
+      for (const auto& face : tet2->m_faces) {
+        // each triangle has 3 vertices, each vertex has a normal
+        for (int i = 0; i < 3; i++) {
+          normals[0].push_back(face.m_normal);
+        }
+      }
+      actor2->m_renderComponent->SetNormals(normals);
+      world.push_back(actor2);
+    }
+
+
+
+
+
+
+
+
+    auto   gui = new MyGui;
+    Engine engine(world, gui);
+    engine.Init();
+    engine.Execute();
+  }
+
+  // sphere case
+  // bunny case
+  if (test_case == 4) {
+    std::vector<Actor*> world;
+
+    auto tet1 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/sphere.mesh",
+                      false);
+    auto tet2 =
+      TetLoader::Load("/Users/wangchenhui/Dev/GamePhysicsInOneWeekend/resource/models/sphere.mesh",
+                      false,
+                      vec3{0.9});
+
+    // boolean operator
+    {
+      SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLine();
+      auto lineVertices =
+        SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).GetIntersectionLineVertices();
+
+      auto line =  SimpleComplex::TetBoolean::GetInstance(tet1.get(), tet2.get()).m_intersectionLine;
+      Actor* line_actor = new ParticlesActor(
+        std::make_shared<geo::Particles3D>(line),
+        "test");
+      line_actor->InitRenderObject(renderer::STATIC, renderer::EDGE);
+      line_actor->SetRenderColor({1, 1, 0});
+      world.push_back(line_actor);
+
+
+      Actor* particle_actor = new ParticlesActor(
+        std::make_shared<geo::Particles3D>(lineVertices),
+        "test");
+      particle_actor->InitRenderObject(renderer::STATIC, renderer::TRIANGLE);
+      particle_actor->SetRenderColor({1, 1, 0});
+      world.push_back(particle_actor);
+    }
+
+
+
+    {
+      auto geoMesh1 = tet1->ToGeoMesh();
+      auto model1   = std::make_shared<geo::Model>();
+      model1->m_meshes.push_back(*geoMesh1);
+
+      auto                actor1 = new ModelActor(model1, "test");
+      actor1->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+      actor1->SetRenderColor({0.7, 0.2, 0});
+      /// normal
+      std::vector<std::vector<vec3>> normals(1);
+      for (const auto& face : tet1->m_faces) {
+        // each triangle has 3 vertices, each vertex has a normal
+        for (int i = 0; i < 3; i++) {
+          normals[0].push_back(face.m_normal);
+        }
+      }
+      actor1->m_renderComponent->SetNormals(normals);
+      world.push_back(actor1);
+    }
+
+
+
+
+
+    {
+      auto geoMesh2 = tet2->ToGeoMesh();
+      auto model2   = std::make_shared<geo::Model>();
+      model2->m_meshes.push_back(*geoMesh2);
+      auto actor2 = new ModelActor(model2, "test");
+      actor2->InitRenderObject(DrawMode::DYNAMIC, PrimitiveType::LINE);
+      actor2->SetRenderColor({0, 0.2, 0.6});
+      /// normal
+      std::vector<std::vector<vec3>> normals(1);
+      normals[0].clear();
+      for (const auto& face : tet2->m_faces) {
+        // each triangle has 3 vertices, each vertex has a normal
+        for (int i = 0; i < 3; i++) {
+          normals[0].push_back(face.m_normal);
+        }
+      }
+      actor2->m_renderComponent->SetNormals(normals);
+      world.push_back(actor2);
+    }
+
+
+
+
+
+
+
+
+    auto   gui = new MyGui;
+    Engine engine(world, gui);
+    engine.Init();
+    engine.Execute();
+  }
+
 }

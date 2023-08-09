@@ -56,9 +56,12 @@ class Particles : public Object {
         if (m_primitiveType == PrimitiveType::LINE) {
             glLineWidth(1.f);
             glDrawArrays(GL_LINE_STRIP, 0, (int)m_particles->m_pos.size() + 1);
-        } else {
-            glPointSize(5.0f);
+        } else if(m_primitiveType == PrimitiveType::TRIANGLE){
+            glPointSize(20.0f);
             glDrawArrays(GL_POINTS, 0, (int)m_particles->m_pos.size());
+        }else{
+            glLineWidth(1.f);
+            glDrawArrays(GL_LINES, 0, (int)m_particles->m_pos.size());
         }
     }
 

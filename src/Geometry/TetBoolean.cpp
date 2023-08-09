@@ -28,8 +28,15 @@ void TetBoolean::GetIntersectionLine() {
   auto             steinerB    = m_B.m_faceSteiner;
   auto             vertexFlagA = m_A.m_vertexFlag;
   auto             vertexFlagB = m_B.m_vertexFlag;
+
+  PHY_DEBUG("there is totally {} triangles", m_A.m_tetMesh->m_faces.size());
+  int faceCntA = -1;
+  int faceCntB = 0;
   for (FaceIterator faceIterA(*A); !faceIterA.Done(); faceIterA.Advance()) {
+    faceCntA++;
+    faceCntB = 0;
     for (FaceIterator faceIterB(*B); !faceIterB.Done(); faceIterB.Advance()) {
+      PHY_DEBUG("A face: {},  B face: {}", faceCntA, faceCntB++);
       Face T1 = faceIterA.Current();
       Face T2 = faceIterB.Current();
 
@@ -47,14 +54,14 @@ void TetBoolean::GetIntersectionLine() {
         auto inter = GetIntersection(o, end, pB0, pB1, pB2);
         if (inter.m_isHit) {
           inters.push_back(inter);
-          auto hitPoint = inter.m_hitPoint;
-          auto& mp = m_B.m_faceSteinerHash;
-          if(mp[faceIterB.Idx()].find(hitPoint) == mp[faceIterB.Idx()].end()){
-            int idx = B->AddVertex(inter.m_hitPoint);
+          auto  hitPoint = inter.m_hitPoint;
+          auto& mp       = m_B.m_faceSteinerHash;
+          if (mp[faceIterB.Idx()].find(hitPoint) == mp[faceIterB.Idx()].end()) {
+            int idx                       = B->AddVertex(inter.m_hitPoint);
             mp[faceIterB.Idx()][hitPoint] = idx;
             steinerB[faceIterB.Idx()].push_back(idx);
-          }else{
-//            steinerB[faceIterB.Idx()].push_back(mp[faceIterB.Idx()][hitPoint]);
+          } else {
+            //            steinerB[faceIterB.Idx()].push_back(mp[faceIterB.Idx()][hitPoint]);
           }
         }
       }
@@ -66,14 +73,14 @@ void TetBoolean::GetIntersectionLine() {
         auto inter = GetIntersection(o, end, pA0, pA1, pA2);
         if (inter.m_isHit) {
           inters.push_back(inter);
-          auto hitPoint = inter.m_hitPoint;
-          auto& mp = m_A.m_faceSteinerHash;
-          if(mp[faceIterA.Idx()].find(hitPoint) == mp[faceIterA.Idx()].end()){
-            int idx = A->AddVertex(inter.m_hitPoint);
+          auto  hitPoint = inter.m_hitPoint;
+          auto& mp       = m_A.m_faceSteinerHash;
+          if (mp[faceIterA.Idx()].find(hitPoint) == mp[faceIterA.Idx()].end()) {
+            int idx                       = A->AddVertex(inter.m_hitPoint);
             mp[faceIterA.Idx()][hitPoint] = idx;
             steinerA[faceIterA.Idx()].push_back(idx);
-          }else{
-//            steinerA[faceIterA.Idx()].push_back(mp[faceIterA.Idx()][hitPoint]);
+          } else {
+            //            steinerA[faceIterA.Idx()].push_back(mp[faceIterA.Idx()][hitPoint]);
           }
         }
       }
@@ -112,6 +119,12 @@ void TetBoolean::GetIntersectionLine() {
           }
         }
       }
+
+      // get intersection line to visualization
+      for (auto inter : inters) {
+        //        PHY_DEBUG("inter: {}", inter.m_hitPoint);
+        m_intersectionLine.push_back(inter.m_hitPoint);
+      }
     }
   }
 
@@ -120,14 +133,25 @@ void TetBoolean::GetIntersectionLine() {
   Triangulate(*B, steinerB, m_B.m_originFaceNum);
 }
 
+std::vector<vec3> TetBoolean::GetIntersectionLineVertices() {
+  auto              A = m_A.m_tetMesh;
+  std::vector<vec3> ret;
+  for (int i = m_A.m_originFaceNum; i < A->m_vertices.size(); i++) {
+    ret.push_back(A->m_vertices[i].ToVec3());
+  }
+  return ret;
+}
+
+
 
 TetBoolean::TwoVecInt SimpleComplex::TetBoolean::AInB() {
   auto A = m_A.m_tetMesh;
   auto B = m_B.m_tetMesh;
   // tetMesh A and B will be changed
   GetIntersectionLine();
+  m_A.m_vertexFlag.resize(m_A.m_tetMesh->m_vertices.size());
 
-  std::vector<int> vertexInNewMesh;
+  std::vector<int> vertexInNewMesh(m_A.m_tetMesh->m_vertices.size());
   std::vector<int> faceInNewMesh;
   std::set<int>    verC;
   for (VertexIterator it(*A); !it.Done(); it.Advance()) {
@@ -144,7 +168,7 @@ TetBoolean::TwoVecInt SimpleComplex::TetBoolean::AInB() {
 
         // neighbour triangles
         for (int t_hat : A->m_VF[v_c]) {
-          faceInNewMesh[t_hat] = 1;
+          faceInNewMesh.push_back(t_hat);
         }
 
         verC.erase(v_c);
@@ -154,9 +178,23 @@ TetBoolean::TwoVecInt SimpleComplex::TetBoolean::AInB() {
   return {vertexInNewMesh, faceInNewMesh};
 }
 
+
+GeoMeshPtr TetBoolean::ToGeoMeshAinB(const std::vector<int>& faceInNewMesh) {
+  auto mesh = std::make_shared<geo::Mesh>();
+  int  cnt  = 0;
+  for (auto i : faceInNewMesh) {
+    for (int j = 0; j < 3; j++) {
+      auto& tet = m_A.m_tetMesh;
+      mesh->vertices.push_back(tet->m_vertices[tet->m_faces[i].m_verts[j]].ToVec3());
+      mesh->indices.push_back(cnt);
+      cnt++;
+    }
+  }
+  return mesh;
+}
+
 void TetBoolean::Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
-                             std::vector<std::vector<int>>&  faceSteiner,
-                             int originFaceNum) {
+                             std::vector<std::vector<int>>& faceSteiner, int originFaceNum) {
   for (FaceIterator it(tetMesh); !it.Done() && it.Idx() < originFaceNum; it.Advance()) {
     if (faceSteiner[it.Idx()].empty())
       continue;
@@ -219,7 +257,42 @@ void TetBoolean::Triangulate(SimpleComplex::TetrahedronMesh& tetMesh,
     for (auto s : steiner) {
       cdt->AddPoint(s);
     }
-    cdt->Triangulate();
+
+
+    PHY_INFO("Poly Line: ({}, {}), ({}, {}), ({}, {}) \n",
+             polyline[0]->x,
+             polyline[0]->y,
+             polyline[1]->x,
+             polyline[1]->y,
+             polyline[2]->x,
+             polyline[2]->y);
+    float eps = 1e-3;
+    vec2 x2d(polyline[0]->x, polyline[0]->y);
+    vec2 y2d(polyline[1]->x, polyline[1]->y);
+    vec2 z2d(polyline[2]->x, polyline[2]->y);
+    if (glm::all(glm::epsilonEqual(
+          x2d, y2d, eps)) ||
+        glm::all(glm::epsilonEqual(
+          z2d, y2d, eps)) ||
+        glm::all(glm::epsilonEqual(
+          x2d, z2d, eps))
+            ) {
+      PHY_DEBUG("delete {}, {}, {}", x2d, y2d, z2d);
+      return;
+    }
+
+    for (auto item : steiner) {
+      PHY_INFO("steiner: ({},{}) \n", item->x, item->y);
+    }
+
+    try{
+      cdt->Triangulate();
+    }catch (const std::exception& e) {
+      return;
+    }catch (const std::runtime_error& e){
+      return;
+    }
+
     std::vector<p2t::Triangle*> triangles = cdt->GetTriangles();
     for (auto tri : triangles) {
       p2t::Point* pa = tri->GetPoint(0);

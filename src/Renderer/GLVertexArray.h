@@ -21,7 +21,8 @@ namespace renderer{
 
     enum PrimitiveType : int {
         LINE = GL_LINES,
-        TRIANGLE = GL_TRIANGLES
+        TRIANGLE = GL_TRIANGLES,
+        EDGE = 3
     };
 
 class GLVertexArray{

@@ -16,7 +16,9 @@ class TetLoader {
   using TetrahedroMesh = SimpleComplex::TetrahedronMesh;
 
 public:
-  static std::unique_ptr<TetrahedroMesh> Load(std::string&& path) {
+  static std::unique_ptr<TetrahedroMesh> Load(std::string&& path,
+                                              bool startWith0 = true,
+                                              const vec3& transform = vec3{0, 0, 0}) {
     std::ifstream       file(path);
     std::string         line;
     bool                readingVertices    = false;
@@ -26,12 +28,12 @@ public:
     while (std::getline(file, line)) {
       if (line.empty())
         continue;
-      if (line == "vert") {
+      if (line == "vert" || line == "vert\r") {
         readingVertices = true;
         continue;
       }
 
-      if (line == "tet") {
+      if (line == "tet" || line == "tet\r") {
         readingTetrahedron = true;
         readingVertices    = false;
         continue;
@@ -42,12 +44,18 @@ public:
         float              x, y, z;
         iss >> x >> y >> z;
         int    vertex_cnt = static_cast<int>(vertices.size());
-        Vertex v{vertex_cnt, x, y, z};
+        Vertex v{vertex_cnt, x + transform.x, y + transform.y, z + transform.z};
+
         vertices.push_back(v);
       } else if (readingTetrahedron) {
         std::istringstream iss(line);
         std::vector<int>   v(4);
         iss >> v[0] >> v[1] >> v[2] >> v[3];
+        if(!startWith0){
+          for(int& item : v){
+            item--;
+          }
+        }
         indices.insert(indices.end(), v.begin(), v.end());
       }
     }
